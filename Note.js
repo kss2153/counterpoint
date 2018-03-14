@@ -6,7 +6,9 @@ function Note(input, x) {
     this.hInterval = -1;
     this.mInterval = -1;
 
+    // N is note number of bottom note, fNote = first top note?
     this.generate = function (N, fNote) {
+        // possible notes: B, C, D, E, F, G, A
         var pNotes = [ 0, 1, 3, 5, 6, 8, 10 ];
 
         if (fNote) {
@@ -45,6 +47,7 @@ function Note(input, x) {
         }
 
         k[5] = N;
+
 
         return k;
     };
@@ -224,6 +227,8 @@ function Note(input, x) {
 
 }
 
+// creates Note objects from integer representations (i.e. 1,3,5...)
+// takes any starting integer and makes that 1
 function intToNote(k) {
     var l1 = [];
     if (k.length === 0) {
@@ -299,6 +304,7 @@ function isGood(input, current, next) {
 function allNextNotes(input, current) {
     var l1 = [];
     if (current.length === 0) {
+        // l2 is the array of possible harmonic intervals converted to note numbers
         var l2 = input[0].generate(input[0].noteNumber, true);
         for (var i = 0; i < l2.length; i++) {
             var a = new Note(l2[i], true);
@@ -320,18 +326,18 @@ function allNextNotes(input, current) {
 }
 
 
+// length: number of notes in complete line
+// a is final solution?
+// noteList: solution so far
+// input: the Note objects that make up the cf
 function search(length, a, noteList, input) {
-    
     times++;
-
-    
     if (length === 0) {
         a.push(noteList);
         return;
     } else {
-        var message = "";
         for (var i = 0; i < allNextNotes(input, noteList).length; i++) {
-            message += i;
+            
             var note = allNextNotes(input, noteList)[i];
             
             if (isGood(input, noteList, allNextNotes(input, noteList)[i])) {

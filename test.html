@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keyworks" content=CounterpointSolver/>
+    <meta name="description" content=CounterPoint/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Counterpoint Solver</title>
+
+        
+<style>
+
+h1{
+    text-align: center;
+}
+
+p{
+    text-align: center;
+    font-family: Arial Black, serif;
+    font-size: 16px;
+}
+
+canvas {
+    padding: 0;
+    margin: auto;
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.button1 {
+    position: absolute;
+    top: 60%;
+    left: 80%;
+    height: 3%;
+    width: 8%;
+}
+
+.button2 {
+    position: absolute;
+    top: 60%;
+    left: 70%;
+    height: 3%;
+    width: 8%;
+}
+
+.button3 {
+    position: absolute;
+    top: 60%;
+    left: 60%;
+    height: 3%;
+    width: 8%;
+}
+
+.button4 {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    height: 3%;
+    width: 8%;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<canvas id="myCanvas" width="200" height="100"
+/*style="border:1px solid #c3c3c3;"*/>
+Your browser does not support the canvas element.
+</canvas>
+
+<h1 id="temp_title">First Species Counterpoint Solver</h1>
+<p id="instructions">Input your cantus firmus in C major starting on Middle C</p>
+
+<p id="demo"></p>
+<p id="test2"></p>
+<p id="test3"></p>
+<div>
+    <button type="button" class="button1" onclick="solve()" >Solve!</button>
+</div>
+
+<div>
+    <button type="button" class="button2" onclick="resetNotes()">Reset</button>
+</div>
+
+<div>
+    <button id="newButton" type="button" class="button3" onclick="newSolution()">Next</button>
+</div>
+
+<div>
+    <button id= "playButton" type="button" class="button4" onclick="play()">Play</button>
+</div>
+
+
+<script src="rules_first_species.js"></script>
+<script src="counterpoint.js"></script>
+<script src="renderer.js"></script>
