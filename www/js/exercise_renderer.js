@@ -22,6 +22,16 @@ var solution_obj = new Solution()
 
 var all_solutions = []
 
+function render_exercise() {
+    var canvas = document.getElementById('myCanvas');   
+    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+    drawStaffLines(canvas);
+    drawClef(canvas, clef_image)
+    drawCantusFirmus()
+    drawNotes(notePoints, noteNums, false); 
+    drawNotes(solutionPoints, solutionNums, true);
+}
+
 function drawStaffLines(canvas) {
     var ctx = canvas.getContext("2d")
     var roomForClef = canvas.width * .03;
@@ -151,7 +161,8 @@ function staff_click(event) {
         solutionNums.push(currentNoteNum);
         if (check_note()) {
             drawNotes(solutionPoints, solutionNums, true);
-            nextHorizontalSection++;            
+            nextHorizontalSection++;
+            persist()            
         }
     }
     startClick = true;
@@ -174,11 +185,7 @@ function staff_hover(event) {
     inSection = (x - leftMargin  > (nextHorizontalSection - 1) * sectionLength) 
             && (x - leftMargin < nextHorizontalSection * sectionLength)
 
-    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-    drawStaffLines(canvas);
-    drawClef(canvas, clef_image)
-    drawNotes(notePoints, noteNums, false); 
-    drawNotes(solutionPoints, solutionNums, true);
+    render_exercise()
 
     // check vertical location of mouse
     var noteSpace = lineSpacing / 2;
@@ -329,6 +336,9 @@ function check_note(note) {
     verbose = true
     if (run_checks(next, Exercise.cantus_firmus, solution_obj)) {
         solution_obj.notes.push(next)
+        if (next.harmonic_interval in solution_obj.perfects) {
+            solution_obj.perfects[next.harmonic_interval]++
+        } 
         verbose = false
         all_solutions = []
         search(all_solutions, Exercise.cantus_firmus.length - solution.length, Exercise.cantus_firmus, solution_obj)
@@ -340,4 +350,28 @@ function check_note(note) {
         return false
     }
     
+}
+
+function persist() {
+    state = {
+        'solution': solution_obj,
+        'nums': solutionNums,
+        'points': solutionPoints,
+        'next': nextHorizontalSection
+    }
+    localStorage.setItem('state', JSON.stringify(state))
+}
+
+function undo() {
+    if (nextHorizontalSection == 1)
+        return
+    var last = solution_obj.notes.pop()
+    if (last.harmonic_interval in solution_obj.perfects) {
+        solution_obj.perfects[last.harmonic_interval]--
+    } 
+    solutionNums.pop()
+    solutionPoints.pop()
+    nextHorizontalSection--
+    persist()
+    render_exercise()
 }

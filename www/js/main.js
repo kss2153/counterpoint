@@ -1,4 +1,4 @@
-
+var state = null
 
 window.onload = window.onresize = function() {
 
@@ -18,11 +18,19 @@ window.onload = window.onresize = function() {
     clef_image = new Image()
     clef_image.src = 'images/treble_clef.png'
     clef_image.onload = function() {
-        drawStaffLines(canvas)
-        drawClef(canvas, clef_image)
-        drawCantusFirmus()        
+        render_exercise()
     }
 
+
+    var load = JSON.parse(localStorage.getItem('state'));
+    if (load) {
+        console.log(load)
+        solution_obj = load['solution']
+        solutionNums = load['nums']
+        solutionPoints = load['points']
+        nextHorizontalSection = load['next']
+        render_exercise()
+    }
 }
 
 function exercise_setup() {
@@ -31,13 +39,4 @@ function exercise_setup() {
     //cf = [ 1, 3, 5, 6, 3, 1]
     Exercise.setUpper()
     Exercise.inputCF(cf)
-}
-
-function play() {
-    for (var i = 0; i < timeouts.length; i++) {
-        clearTimeout(timeouts[i]);
-    }
-    if (solutionNums.length > 0) {
-        playLine(solutionNums, noteNums);
-    }
 }
