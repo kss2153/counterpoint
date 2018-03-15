@@ -32,3 +32,12 @@ function exercise_setup() {
     Exercise.setUpper()
     Exercise.inputCF(cf)
 }
+
+function play() {
+    for (var i = 0; i < timeouts.length; i++) {
+        clearTimeout(timeouts[i]);
+    }
+    if (solutionNums.length > 0) {
+        playLine(solutionNums, noteNums);
+    }
+}
