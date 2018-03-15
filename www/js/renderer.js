@@ -418,7 +418,7 @@ function convertNumFromTop() {
         var num = noteNums[i];
         switch (num) {
             case -5: converted.push(29); break;
-	    case -4: converted.push(27); break;
+	        case -4: converted.push(27); break;
             case -3: converted.push(25); break;
             case -2: converted.push(24); break;
             case -1: converted.push(22); break;

@@ -46,7 +46,7 @@ var rule_1 = new Rule(function(note, cantus_firmus, solution) {
 
     return true
 
-}, 'No similar or parallel motion to a perfect interval', 1)
+}, 'No similar or parallel motion to a perfect interval', 12)
 
 // to be checked after rule 1
 var rule_2 = new Rule(function(note, cantus_firmus, solution) {
@@ -277,6 +277,27 @@ var rule_11 = new Rule(function(note, cantus_firmus, solution) {
 
 }, 'Allow tied notes only once or twice throughout', 11)
 
+var rule_12 = new Rule(function(note, cantus_firmus, solution) {
+    pos = solution.notes.length
+    if (pos !== 0) {
+        var choices = generate_major(cantus_firmus[pos].note_number, false)
+        if (choices.includes(note.note_number)) {
+            return true
+        } 
+    }
+    return false
+}, 'This interval is a dissonance', 1)
+
+var rule_13 = new Rule(function(note, cantus_firmus, solution) {
+    pos = solution.notes.length
+    if (pos === 0) {
+        var choices = generate_major(cantus_firmus[pos].note_number, true)
+        if (choices.includes(note.note_number)) {
+            return true
+        } 
+    }
+    return false 
+}, 'The first interval must be a unison, fifth, or octave', 1)
 
 function run_checks(note, cantus_firmus, solution) {
     if (check_helper(rule_1, note, cantus_firmus, solution) &&

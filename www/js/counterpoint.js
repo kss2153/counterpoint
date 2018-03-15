@@ -192,5 +192,3 @@ function main() {
     })
     console.log(all)
 }
-
-main()
