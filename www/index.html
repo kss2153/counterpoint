@@ -28,16 +28,16 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
         <div class="container">
-            <a class="navbar-brand js-scroll-trigger" href="/#">Learn Counterpoint</a>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                    <a class="nav-link" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Rules</a>
-                    </li>
-                    <li class="nav-item">
-                    <a class="nav-link">Species</a>
-                    </li>
-                </ul>
+            <a class="navbar-brand js-scroll-trigger" href="#">Learn Counterpoint</a>
+            <div class="nav-item">
+                <a style="color:white;margin-right:5px" onclick="undo()" href="#">undo</a>
+                <a style="color:white;margin-left:5px"  onclick="redo()" href="#">redo</a>
+            </div>
+            <div class="nav-item">
+                <a style="color:white"  href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">rules</a>
+            </div>
+            <div class="nav-item">
+                <a style="color:white" href="#" >species</a>
             </div>
         </div>
     </nav>

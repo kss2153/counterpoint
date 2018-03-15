@@ -24,14 +24,22 @@ window.onload = window.onresize = function() {
 
     var load = JSON.parse(localStorage.getItem('state'));
     if (load) {
-        console.log(load)
+        render_exercise()
         solution_obj = load['solution']
         solutionNums = load['nums']
-        solutionPoints = load['points']
+        solutionPoints = getSolutionPoints()
         nextHorizontalSection = load['next']
         render_exercise()
     }
 }
+
+function getSolutionPoints() {
+    var result = []
+    for (var i = 0; i < solutionNums.length; i++) {
+        result.push(getNotePoint(solutionNums[i], i))
+    }
+    return result
+} 
 
 function exercise_setup() {
     var cf = [ 1, 5 , 6, 8,  5, 10, 8, 5, 6, 5, 3, 1 ]

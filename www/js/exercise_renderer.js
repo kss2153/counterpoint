@@ -160,6 +160,9 @@ function staff_click(event) {
         solutionPoints.push(currentNotePoint);
         solutionNums.push(currentNoteNum);
         if (check_note()) {
+            state_stack_nums.pop()
+            state_stack_notes.pop()
+            state_stack_points.pop()
             drawNotes(solutionPoints, solutionNums, true);
             nextHorizontalSection++;
             persist()            
@@ -238,7 +241,6 @@ function getNotePoint(noteNumberFromTop, index) {
     var sectionLength = lineLength / horizontalSections;    
     centerX = leftMargin + ((index + 1) * sectionLength) - (sectionLength / 2);
     var centerY = noteNumberFromTop * noteSpace + (topMargin - noteSpace); 
-
     return {x: centerX, y: centerY};
 }
 
@@ -362,16 +364,31 @@ function persist() {
     localStorage.setItem('state', JSON.stringify(state))
 }
 
+var state_stack_nums = []
+var state_stack_points = []
+var state_stack_notes = []
+
 function undo() {
     if (nextHorizontalSection == 1)
         return
     var last = solution_obj.notes.pop()
+    state_stack_notes.push(last)
     if (last.harmonic_interval in solution_obj.perfects) {
         solution_obj.perfects[last.harmonic_interval]--
     } 
-    solutionNums.pop()
-    solutionPoints.pop()
+    state_stack_nums.push(solutionNums.pop())
+    state_stack_points.push(solutionPoints.pop())
     nextHorizontalSection--
     persist()
     render_exercise()
+}
+
+function redo() {
+    if (state_stack_notes.length > 0) {
+        nextHorizontalSection++
+        solutionNums.push(state_stack_nums.pop())
+        solutionPoints.push(state_stack_points.pop())
+        solution_obj.notes.push(state_stack_notes.pop())
+        render_exercise()
+    }
 }
