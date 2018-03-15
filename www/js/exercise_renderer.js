@@ -15,6 +15,13 @@ var lineSpacing;
 var notePoints = [];
 var noteNums = [];
 
+var solutionPoints = [];
+var solutionNums = [];
+
+var solution_obj = new Solution()
+
+var all_solutions = []
+
 function drawStaffLines(canvas) {
     var ctx = canvas.getContext("2d")
     var roomForClef = canvas.width * .03;
@@ -56,7 +63,6 @@ function drawClef(canvas, clef_image) {
 }
 
 function drawNotes(noteArray, numArray, solutionLine) {
-    console.log(numArray)
     var canvas = document.getElementById('myCanvas');  
     var c = canvas.getContext("2d");
     var noteSpace = lineSpacing / 2;
@@ -133,11 +139,77 @@ function drawOffStaffLines(noteNumberFromTop, ctx, centerX, centerY) {
 }
 
 function staff_click(event) {
-    
+    if (!startClick) { return; }
+    startClick = false;
+
+    var alert = document.getElementById('alert')
+    alert.style.visibility = 'hidden'
+
+    if (inSection) {
+        inSection = false;
+        solutionPoints.push(currentNotePoint);
+        solutionNums.push(currentNoteNum);
+        if (check_note()) {
+            drawNotes(solutionPoints, solutionNums, true);
+            nextHorizontalSection++;            
+        }
+    }
+    startClick = true;
 }
     
 function staff_hover(event) {
-    
+
+    if (nextHorizontalSection > horizontalSections) {
+        return;
+    }
+
+    var canvas = document.getElementById('myCanvas');     
+    var mousePos = getMousePos(canvas, event);
+    var x = mousePos.x;
+    var y = mousePos.y;
+
+    // check horizontal location of mouse
+    var lineLength = canvas.width - 2 * leftMargin; 
+    var sectionLength = lineLength / horizontalSections;
+    inSection = (x - leftMargin  > (nextHorizontalSection - 1) * sectionLength) 
+            && (x - leftMargin < nextHorizontalSection * sectionLength)
+
+    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+    drawStaffLines(canvas);
+    drawClef(canvas, clef_image)
+    drawNotes(notePoints, noteNums, false); 
+    drawNotes(solutionPoints, solutionNums, true);
+
+    // check vertical location of mouse
+    var noteSpace = lineSpacing / 2;
+    if (inSection && y > topMargin - (noteSpace * 6)
+            && y < topMargin + (4 * lineSpacing) + 9*noteSpace) {
+        drawHoverNote(canvas, y);
+    }
+}
+
+function drawHoverNote(canvas, y) {
+    var noteSpace = lineSpacing / 2;
+    // could change topmargin to the highest allowed note
+    var dist = y - (topMargin - noteSpace);
+    var noteNumberFromTop = Math.floor(dist / noteSpace); 
+    currentNoteNum = noteNumberFromTop;    
+
+    var lineLength = canvas.width - 2 * leftMargin; 
+    var sectionLength = lineLength / horizontalSections;    
+    var centerX = leftMargin + (nextHorizontalSection * sectionLength) - (sectionLength / 2);
+    var centerY = noteNumberFromTop * noteSpace + (topMargin - noteSpace); 
+
+    currentNotePoint = {x: centerX, y: centerY};
+    var ctx = canvas.getContext("2d");
+
+    drawOffStaffLines(noteNumberFromTop, ctx, centerX, centerY);
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY,noteSpace/2,0,2*Math.PI);
+    ctx.fillStyle = "red";
+    ctx.fill();
+    ctx.closePath();
 }
 
 function getMousePos(canvas, evt) {
@@ -157,7 +229,6 @@ function getNotePoint(noteNumberFromTop, index) {
 
     var lineLength = canvas.width - 2 * leftMargin; 
     var sectionLength = lineLength / horizontalSections;    
-    console.log(leftMargin)
     centerX = leftMargin + ((index + 1) * sectionLength) - (sectionLength / 2);
     var centerY = noteNumberFromTop * noteSpace + (topMargin - noteSpace); 
 
@@ -165,17 +236,15 @@ function getNotePoint(noteNumberFromTop, index) {
 }
 
 function drawCantusFirmus() {
-    console.log(Exercise)
     notes = Exercise.cantus_firmus
-    console.log(notes)
     horizontalSections = notes.length
     points = [];
     staff_nums = convertToTop(notes);
-    console.log(staff_nums)
     for (var i = 0; i < staff_nums.length; i++) {
         points.push(getNotePoint(staff_nums[i], i));
     }
-    console.log(points)
+    noteNums = staff_nums
+    notePoints = points
     drawNotes(points, staff_nums, false); 
 }
 
@@ -183,7 +252,6 @@ function convertToTop(note_list) {
     var converted = [];
     for (var i = 0; i < note_list.length; i++) {
         var num = note_list[i].note_number + Exercise.key_center;
-        console.log(num)
         switch (num) {
             case 88: converted.push(-5); break;
             case 86: converted.push(-4); break;
@@ -213,3 +281,63 @@ function convertToTop(note_list) {
     return converted;
 }
 
+function convertNumFromTop() {
+    var converted = [];
+    for (var i = 0; i < noteNums.length; i++) {
+        var num = solutionNums[i];
+        switch (num) {
+            case -5: converted.push(88); break;
+	        case -4: converted.push(86); break;
+            case -3: converted.push(84); break;
+            case -2: converted.push(83); break;
+            case -1: converted.push(81); break;
+            case 0: converted.push(79); break;
+            case 1: converted.push(77); break;
+            case 2: converted.push(76); break;
+            case 3: converted.push(74); break;
+            case 4: converted.push(72); break;
+            case 5: converted.push(71); break;
+            case 6: converted.push(69); break;
+            case 7: converted.push(67); break;
+            case 8: converted.push(65); break; 
+            case 9: converted.push(64); break;
+            case 10: converted.push(62); break;
+            case 11: converted.push(60); break;
+            case 12: converted.push(59); break;
+            case 13: converted.push(57); break;
+            case 14: converted.push(55); break;
+            case 15: converted.push(53); break;
+            case 16: converted.push(52); break;
+            case 17: converted.push(50); break;
+        }
+    }
+    return converted;
+}
+
+function check_note(note) {
+    var solution = convertNumFromTop()
+    var idx = solution.length - 1
+    var note = solution[idx]
+    var first = solution.length === 1
+    var next = new RelativeNote(note - Exercise.key_center , first)
+    next.harmonic_interval = next.note_number - Exercise.cantus_firmus[idx].note_number
+    if (!first) {
+        var prev = solution_obj.notes[idx - 1]
+        next.melodic_interval = next.note_number - prev.note_number
+    }
+
+    verbose = true
+    if (run_checks(next, Exercise.cantus_firmus, solution_obj)) {
+        solution_obj.notes.push(next)
+        verbose = false
+        all_solutions = []
+        search(all_solutions, Exercise.cantus_firmus.length - solution.length, Exercise.cantus_firmus, solution_obj)
+        console.log(all_solutions.length)
+        return true
+    } else {
+        solutionNums.pop()
+        solutionPoints.pop()
+        return false
+    }
+    
+}

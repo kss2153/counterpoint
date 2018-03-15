@@ -36,9 +36,18 @@ var rule_1 = new Rule(function(note, cantus_firmus, solution) {
         return true
     }
 
-    var dir_sol = (note.note_number - solution.notes[pos - 1].note_number) > 0
+
+
+    var dir_sol = (note.note_number - solution.notes[pos - 1].note_number)
     var dir_cf = (cantus_firmus[pos].note_number - 
-        cantus_firmus[pos - 1].note_number) > 0
+        cantus_firmus[pos - 1].note_number)
+
+    if (dir_sol === 0) {
+        return true
+    } else {
+        dir_sol = dir_sol > 0
+        dir_cf = dir_cf > 0
+    }
     
     if ((dir_cf && dir_sol) || (!dir_cf && !dir_sol)) {
         return false
@@ -193,7 +202,7 @@ var rule_8 = new Rule(function(note, cantus_firmus, solution) {
              return false
         }
 
-        if (prev.melodic_interval < -4 && note.note_number > prev.note_number + 3) {
+        if (prev.melodic_interval < -4 && note.note_number > prev.note_number + 4) {
             return false
        }
     } else {
@@ -201,7 +210,7 @@ var rule_8 = new Rule(function(note, cantus_firmus, solution) {
             return false
         } 
 
-        if (prev.melodic_interval > 4 && note.note_number < prev.note_number - 3) {
+        if (prev.melodic_interval > 4 && note.note_number < prev.note_number - 4) {
             return false
         } 
     }
@@ -279,25 +288,27 @@ var rule_11 = new Rule(function(note, cantus_firmus, solution) {
 
 var rule_12 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
-    if (pos !== 0) {
-        var choices = generate_major(cantus_firmus[pos].note_number, false)
-        if (choices.includes(note.note_number)) {
-            return true
-        } 
-    }
-    return false
-}, 'This interval is a dissonance', 1)
-
-var rule_13 = new Rule(function(note, cantus_firmus, solution) {
-    pos = solution.notes.length
     if (pos === 0) {
         var choices = generate_major(cantus_firmus[pos].note_number, true)
         if (choices.includes(note.note_number)) {
             return true
         } 
+        return false
+    }
+    return true 
+}, 'The first interval must be a unison, fifth, or octave', 12)
+
+var rule_13 = new Rule(function(note, cantus_firmus, solution) {
+    pos = solution.notes.length
+    
+    var choices = generate_major(cantus_firmus[pos].note_number, false)
+    if (choices.includes(note.note_number)) {
+        return true
     }
     return false 
-}, 'The first interval must be a unison, fifth, or octave', 1)
+  
+    
+}, 'This interval is a dissonance', 13)
 
 function run_checks(note, cantus_firmus, solution) {
     if (check_helper(rule_1, note, cantus_firmus, solution) &&
@@ -310,15 +321,20 @@ function run_checks(note, cantus_firmus, solution) {
         check_helper(rule_8, note, cantus_firmus, solution) &&
         check_helper(rule_9, note, cantus_firmus, solution) &&
         check_helper(rule_10, note, cantus_firmus, solution) &&
-        check_helper(rule_11, note, cantus_firmus, solution))
+        check_helper(rule_11, note, cantus_firmus, solution) &&
+        check_helper(rule_12, note, cantus_firmus, solution) &&
+        check_helper(rule_13, note, cantus_firmus, solution))
     return true
 }
 
 function check_helper(rule, note, cantus_firmus, solution) {
     if (!rule.check(note, cantus_firmus, solution)) {
-        // console.log(rule.msg + " error: " + rule.code)
-        // console.log(solution)
-        //console.log(note)
+        if (verbose) {
+            var alert = document.getElementById('alert')
+            alert.innerHTML = rule.msg
+            alert.style.visibility = 'visible'
+            console.log(rule.msg + " error: " + rule.code)
+        }
         return false
     }
     return true

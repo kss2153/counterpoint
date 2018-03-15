@@ -19,34 +19,16 @@ canvas {
     right: 0;
 }
 
-.button1 {
-    position: absolute;
-    top: 60%;
-    left: 80%;
-    height: 3%;
-    width: 8%;
+header {
+  padding: 154px 0 100px;
 }
 
-.button2 {
-    position: absolute;
-    top: 60%;
-    left: 70%;
-    height: 3%;
-    width: 8%;
+@media (min-width: 992px) {
+  header {
+    padding: 156px 0 100px;
+  }
 }
 
-.button3 {
-    position: absolute;
-    top: 60%;
-    left: 60%;
-    height: 3%;
-    width: 8%;
-}
-
-.button4 {
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    height: 3%;
-    width: 8%;
+section {
+  padding: 150px 0;
 }
