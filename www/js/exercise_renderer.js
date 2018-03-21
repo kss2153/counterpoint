@@ -25,11 +25,13 @@ var all_solutions = []
 function render_exercise() {
     var canvas = document.getElementById('myCanvas');   
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-    drawStaffLines(canvas);
+    
     drawClef(canvas, clef_image)
     drawCantusFirmus()
     drawNotes(notePoints, noteNums, false); 
     drawNotes(solutionPoints, solutionNums, true);
+    drawStaffLines(canvas);
+    drawBarLines()
 }
 
 function drawStaffLines(canvas) {
@@ -72,6 +74,25 @@ function drawClef(canvas, clef_image) {
         topMargin - lineSpacing, roomForClef, lineSpacing * 6.5); 
 }
 
+function drawBarLines() {
+    var canvas = document.getElementById('myCanvas'); 
+    var c = canvas.getContext("2d");
+    var roomForClef = canvas.width * .03;
+    var lineLength = canvas.width - 2 * leftMargin; 
+    var sectionLength = lineLength / horizontalSections;
+
+    c.beginPath()
+    for (var i = 1; i <= Exercise.cantus_firmus.length; i++) {
+        var cur_x = leftMargin + sectionLength*i
+        c.moveTo(cur_x, topMargin)
+        c.lineTo(cur_x, topMargin + lineSpacing*4)
+    }
+    c.stroke()
+    c.closePath()
+
+
+}
+
 function drawNotes(noteArray, numArray, solutionLine) {
     var canvas = document.getElementById('myCanvas');  
     var c = canvas.getContext("2d");
@@ -81,20 +102,28 @@ function drawNotes(noteArray, numArray, solutionLine) {
         var xPos = noteArray[i].x;
         var yPos = noteArray[i].y;
 	    var radius = noteSpace * (2/3);
-        c.arc(xPos, yPos, radius, 0, 2*Math.PI);
+        //c.arc(xPos, yPos, radius, 0, 2*Math.PI);
+        c.ellipse(xPos, yPos,radius*1.2, radius, 0, 0, 2*Math.PI, false)
         c.fillStyle = "black";
+        //c.lineWidth = 3
         c.fill();
         c.closePath();
         c.beginPath();
-        if (solutionLine) {
-            c.moveTo(xPos + radius, yPos);
-            c.lineTo(xPos + radius, yPos - lineSpacing * 2);
-        } else {
-            c.moveTo(xPos - radius, yPos);
-            c.lineTo(xPos - radius, yPos + lineSpacing * 2);
-        }
-        c.stroke();
-        c.closePath(); 
+        c.ellipse(xPos, yPos,radius*0.5, radius*0.9, 0, 0, 2*Math.PI, false)
+        c.fillStyle = "white";
+        c.fill()
+        //c.lineWidth = 1
+        c.closePath();
+        // c.beginPath();
+        // if (solutionLine) {
+        //     c.moveTo(xPos + radius, yPos);
+        //     c.lineTo(xPos + radius, yPos - lineSpacing * 2);
+        // } else {
+        //     c.moveTo(xPos - radius, yPos);
+        //     c.lineTo(xPos - radius, yPos + lineSpacing * 2);
+        // }
+        // c.stroke();
+        // c.closePath(); 
         drawOffStaffLines(numArray[i], c, noteArray[i].x, noteArray[i].y);
     }
 }
@@ -389,6 +418,19 @@ function redo() {
         solutionNums.push(state_stack_nums.pop())
         solutionPoints.push(state_stack_points.pop())
         solution_obj.notes.push(state_stack_notes.pop())
+        persist()
         render_exercise()
     }
+}
+
+function reset() {
+    var state_stack_nums = []
+    var state_stack_points = []
+    var state_stack_notes = []
+    nextHorizontalSection = 1
+    solutionNums = []
+    solution_obj = new Solution()
+    solutionPoints = []
+    persist()
+    render_exercise()
 }
