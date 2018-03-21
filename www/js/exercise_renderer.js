@@ -78,12 +78,12 @@ function drawBarLines() {
     var canvas = document.getElementById('myCanvas'); 
     var c = canvas.getContext("2d");
     var roomForClef = canvas.width * .03;
-    var lineLength = canvas.width - 2 * leftMargin; 
+    var lineLength = canvas.width - 2 * leftMargin - roomForClef; 
     var sectionLength = lineLength / horizontalSections;
 
     c.beginPath()
     for (var i = 1; i <= Exercise.cantus_firmus.length; i++) {
-        var cur_x = leftMargin + sectionLength*i
+        var cur_x = leftMargin + sectionLength*i + roomForClef
         c.moveTo(cur_x, topMargin)
         c.lineTo(cur_x, topMargin + lineSpacing*4)
     }
@@ -192,7 +192,7 @@ function staff_click(event) {
             state_stack_nums.pop()
             state_stack_notes.pop()
             state_stack_points.pop()
-            drawNotes(solutionPoints, solutionNums, true);
+            render_exercise()
             nextHorizontalSection++;
             persist()            
         }
@@ -234,9 +234,9 @@ function drawHoverNote(canvas, y) {
     var noteNumberFromTop = Math.floor(dist / noteSpace); 
     currentNoteNum = noteNumberFromTop;    
 
-    var lineLength = canvas.width - 2 * leftMargin; 
+    var lineLength = canvas.width - 2 * leftMargin - 0.03*canvas.width; 
     var sectionLength = lineLength / horizontalSections;    
-    var centerX = leftMargin + (nextHorizontalSection * sectionLength) - (sectionLength / 2);
+    var centerX = leftMargin + 0.03*canvas.width + (nextHorizontalSection * sectionLength) - (sectionLength * 8 / 10);
     var centerY = noteNumberFromTop * noteSpace + (topMargin - noteSpace); 
 
     currentNotePoint = {x: centerX, y: centerY};
@@ -266,9 +266,9 @@ function getNotePoint(noteNumberFromTop, index) {
     var noteSpace = lineSpacing / 2;
     var canvas = document.getElementById('myCanvas');
 
-    var lineLength = canvas.width - 2 * leftMargin; 
+    var lineLength = canvas.width - 2 * leftMargin - 0.03*canvas.width; 
     var sectionLength = lineLength / horizontalSections;    
-    centerX = leftMargin + ((index + 1) * sectionLength) - (sectionLength / 2);
+    centerX = leftMargin +0.03*canvas.width + ((index + 1) * sectionLength) - (sectionLength * 8 / 10);
     var centerY = noteNumberFromTop * noteSpace + (topMargin - noteSpace); 
     return {x: centerX, y: centerY};
 }
@@ -372,7 +372,9 @@ function check_note(note) {
         } 
         verbose = false
         all_solutions = []
-        search(all_solutions, Exercise.cantus_firmus.length - solution.length, Exercise.cantus_firmus, solution_obj)
+        sol_copy = new Solution()
+        sol_copy.copy_prev(solution_obj)
+        search(all_solutions, Exercise.cantus_firmus.length - solution.length, Exercise.cantus_firmus, sol_copy)
         console.log(all_solutions.length)
         return true
     } else {
@@ -405,6 +407,11 @@ function undo() {
     if (last.harmonic_interval in solution_obj.perfects) {
         solution_obj.perfects[last.harmonic_interval]--
     } 
+    if (solution_obj.notes.length > 0) {
+        if (last.note_number == solution_obj.notes[solution_obj.notes.length - 1].note_number) {
+            solution_obj.obliques--
+        }
+    }
     state_stack_nums.push(solutionNums.pop())
     state_stack_points.push(solutionPoints.pop())
     nextHorizontalSection--
