@@ -9,10 +9,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Bootstrap -->
-    <link href="css/bootstrap.css" rel="stylesheet">
+    <!-- <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <script src="js/rules_first_species.js"></script>
     <script src="js/counterpoint.js"></script>
@@ -25,38 +30,66 @@
 
 <body>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-        <div class="container">
-            <a class="navbar-brand js-scroll-trigger" href="#">Learn Counterpoint</a>
-            <div class="nav-item">
-                <a style="color:white;margin-right:5px" onclick="undo()" href="#">undo</a>
-                <a style="color:white;margin-left:5px"  onclick="redo()" href="#">redo</a>
-            </div>
-            <div class="nav-item">
-                <a style="color:white"  href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">rules</a>
-            </div>
-            <div class="nav-item">
-                <a style="color:white" href="#" >species</a>
-            </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="#">Learn Counterpoint</a>
+        
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            
+
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        rules
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        species
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="toggle_top(this)">upper</a></li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" onclick="undo()" href="#">undo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="redo()" href="#">redo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="reset()" href="#">reset</a>
+                </li>
+            </ul>
+            
         </div>
     </nav>
-   
-    <canvas id="myCanvas" width="200" height="100">
+    
+    <canvas id="myCanvas" width="200" height="100" style="width:100%">
         Your browser does not support the canvas element.
     </canvas>
 
-    <div style="visibility:hidden;width:50%;margin:auto;margin-top:10%;text-align:center" 
+   <div style="visibility:hidden;width:60%;margin:auto;position:fixed;top:10%;left:20%;text-align:center" 
         class="alert alert-danger" role="alert" id="alert">
     </div>
 
-
+<!-- 
+    width:50%;margin:auto;margin-top:10%
     <div style="position:fixed;bottom:15%;left:10%">
         <a onclick="reset()" role="button" class="btn btn-secondary" style="color:white">reset</a>
-    </div>
+    </div>  -->
 
-
-    
 
     <div style="position: fixed; bottom: 0px; width: 100%;">
         <div style="text-align: center">by Kayvon Seif-Naraghi</div>

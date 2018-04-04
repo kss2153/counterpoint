@@ -1,7 +1,11 @@
 var state = null
 
 window.onload = window.onresize = function() {
-
+    document.body.addEventListener('keydown', function (e) {
+        if (e.keyCode == 8)
+            undo()
+    })
+ 
     exercise_setup()
     
     var canvas = document.getElementById('myCanvas') 
@@ -15,9 +19,24 @@ window.onload = window.onresize = function() {
     // draw staff
     var roomForClef = canvas.width * .03
 
-    clef_image = new Image()
-    clef_image.src = 'images/treble_clef.png'
-    clef_image.onload = function() {
+    treble_clef_image = new Image()
+    alto_clef_image = new Image()
+    bass_clef_image = new Image()
+    brace_image = new Image()
+    treble_clef_image.src = 'images/treble_clef.png'
+    treble_clef_image.onload = function() {
+        render_exercise()
+    }
+    alto_clef_image.src = 'images/alto_clef.png'
+    alto_clef_image.onload = function() {
+        render_exercise()
+    }
+    bass_clef_image.src = 'images/bass_clef.png'
+    bass_clef_image.onload = function() {
+        render_exercise()
+    }
+    brace_image.src = 'images/brace.png'
+    brace_image.onload = function() {
         render_exercise()
     }
 
@@ -48,3 +67,4 @@ function exercise_setup() {
     Exercise.setUpper()
     Exercise.inputCF(cf)
 }
+

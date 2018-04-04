@@ -25,21 +25,39 @@ var all_solutions = []
 function render_exercise() {
     var canvas = document.getElementById('myCanvas');   
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+    var roomForClef = canvas.width * .03;
+    leftMargin = canvas.width * .1 + roomForClef;
+    topMargin = canvas.height * .6;
+    lineSpacing = canvas.height * .02;
     
-    drawClef(canvas, clef_image)
+    drawClef(canvas, bass_clef_image)
+    if (!Exercise.upper_cp)
+        drawNotes(solutionPoints, solutionNums, true);
+    drawStaffLines(canvas);
+    topMargin = canvas.height * .45;
+    drawClef(canvas, alto_clef_image)
     drawCantusFirmus()
-    drawNotes(notePoints, noteNums, false); 
-    drawNotes(solutionPoints, solutionNums, true);
+    drawStaffLines(canvas);
+    topMargin = canvas.height * .3;
+    drawClef(canvas, treble_clef_image)
+    if (Exercise.upper_cp)
+        drawNotes(solutionPoints, solutionNums, true);
     drawStaffLines(canvas);
     drawBarLines()
+    drawBrace(canvas, brace_image)
+
+    if (Exercise.upper_cp) {
+        topMargin = canvas.height * .3;
+    } else {
+        topMargin = canvas.height * .6;
+    }
+    
 }
 
 function drawStaffLines(canvas) {
     var ctx = canvas.getContext("2d")
     var roomForClef = canvas.width * .03;
-    leftMargin = canvas.width * .1;
-    topMargin = canvas.height * .4;
-    lineSpacing = canvas.height * .03;
 
     ctx.beginPath();
     var currentPos = topMargin;
@@ -74,6 +92,15 @@ function drawClef(canvas, clef_image) {
         topMargin - lineSpacing, roomForClef, lineSpacing * 6.5); 
 }
 
+function drawBrace(canvas, brace_image) {
+    var c = canvas.getContext("2d");
+    var braceWidth = canvas.width * .015;
+    var roomForClef = canvas.width * .03;
+
+    c.drawImage(brace_image, leftMargin - roomForClef - braceWidth * 2, 
+        canvas.height * 0.3 - lineSpacing/2, braceWidth, canvas.height * 0.3 + lineSpacing*5); 
+}
+
 function drawBarLines() {
     var canvas = document.getElementById('myCanvas'); 
     var c = canvas.getContext("2d");
@@ -85,8 +112,10 @@ function drawBarLines() {
     for (var i = 1; i <= Exercise.cantus_firmus.length; i++) {
         var cur_x = leftMargin + sectionLength*i + roomForClef
         c.moveTo(cur_x, topMargin)
-        c.lineTo(cur_x, topMargin + lineSpacing*4)
+        c.lineTo(cur_x, canvas.height * .6 + lineSpacing*4)
     }
+    c.moveTo(cur_x - canvas.width * .005, topMargin)
+    c.lineTo(cur_x - canvas.width * .005, canvas.height * .6 + lineSpacing*4)
     c.stroke()
     c.closePath()
 
@@ -277,13 +306,43 @@ function drawCantusFirmus() {
     notes = Exercise.cantus_firmus
     horizontalSections = notes.length
     points = [];
-    staff_nums = convertToTop(notes);
+    staff_nums = convertToTopAlto(notes);
     for (var i = 0; i < staff_nums.length; i++) {
         points.push(getNotePoint(staff_nums[i], i));
     }
     noteNums = staff_nums
     notePoints = points
     drawNotes(points, staff_nums, false); 
+}
+
+function convertToTopAlto(note_list) {
+    var converted = [];
+    for (var i = 0; i < note_list.length; i++) {
+        var num = note_list[i].note_number + Exercise.key_center;
+        switch (num) {
+            case 77: converted.push(-5); break;
+            case 76: converted.push(-4); break;
+            case 74: converted.push(-3); break;
+            case 72: converted.push(-2); break;
+            case 71: converted.push(-1); break;
+            case 69: converted.push(0); break;
+            case 67: converted.push(1); break;
+            case 65: converted.push(2); break;
+            case 64: converted.push(3); break;
+            case 62: converted.push(4); break;
+            case 60: converted.push(5); break;
+            case 59: converted.push(6); break;
+            case 57: converted.push(7); break;
+            case 55: converted.push(8); break; 
+            case 53: converted.push(9); break;
+            case 52: converted.push(10); break;
+            case 50: converted.push(11); break;
+            case 48: converted.push(12); break;
+            case 47: converted.push(13); break;
+            case 45: converted.push(14); break;
+        }
+    }
+    return converted;
 }
 
 function convertToTop(note_list) {
@@ -351,9 +410,48 @@ function convertNumFromTop() {
     }
     return converted;
 }
+function convertNumFromTopBass() {
+    var converted = [];
+    for (var i = 0; i < noteNums.length; i++) {
+        var num = solutionNums[i];
+        switch (num) {
+            case -5: converted.push(67); break;
+	        case -4: converted.push(65); break;
+            case -3: converted.push(64); break;
+            case -2: converted.push(62); break;
+            case -1: converted.push(60); break;
+            case 0: converted.push(59); break;
+            case 1: converted.push(57); break;
+            case 2: converted.push(55); break;
+            case 3: converted.push(53); break;
+            case 4: converted.push(52); break;
+            case 5: converted.push(50); break;
+            case 6: converted.push(48); break;
+            case 7: converted.push(47); break;
+            case 8: converted.push(45); break; 
+            case 9: converted.push(43); break;
+            case 10: converted.push(41); break;
+            case 11: converted.push(40); break;
+            case 12: converted.push(38); break;
+            case 13: converted.push(36); break;
+            case 14: converted.push(35); break;
+            case 15: converted.push(33); break;
+            case 16: converted.push(31); break;
+            case 17: converted.push(29); break;
+        }
+    }
+    return converted;
+}
 
 function check_note(note) {
-    var solution = convertNumFromTop()
+    var solution
+    if (Exercise.upper_cp) {
+        solution = convertNumFromTop()
+    } else {
+        solution  = convertNumFromTopBass()
+        console.log(solution)
+    }
+     
     var idx = solution.length - 1
     var note = solution[idx]
     var first = solution.length === 1
@@ -440,4 +538,16 @@ function reset() {
     solutionPoints = []
     persist()
     render_exercise()
+}
+
+function toggle_top(link) {
+    if (link.innerHTML == 'upper') {
+        Exercise.setLower()
+        reset()
+        link.innerHTML = 'lower'
+    } else {
+        Exercise.setUpper()
+        reset()
+        link.innerHTML = 'upper'
+    }
 }

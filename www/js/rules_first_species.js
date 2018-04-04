@@ -64,7 +64,7 @@ var rule_2 = new Rule(function(note, cantus_firmus, solution) {
         return true
     }
 
-    var perfects = [0, 7]
+    var perfects = [0, 7, -7]
 
     var interval = note.norm_harmonic()
     if (perfects.includes(interval) 
@@ -138,22 +138,26 @@ var rule_6 = new Rule(function(note, cantus_firmus, solution) {
     if (pos < 3) {
         return true
     }
-    var prev1 = solution.notes[pos - 1].harmonic_interval
+    var dir = 1
+    if (!Exercise.upper_cp){
+        dir = -1
+    }
+    var prev1 = solution.notes[pos - 1].harmonic_interval * dir
     var third1 = (prev1 === 3 || prev1 === 4)
     var sixth1 = (prev1 === 8 || prev1 === 9)
     var tenth1 = (prev1 === 15 || prev1 === 16)
 
-    var prev2 = solution.notes[pos - 2].harmonic_interval
+    var prev2 = solution.notes[pos - 2].harmonic_interval * dir
     var third2 = (prev2 === 3 || prev2 === 4)
     var sixth2 = (prev2 === 8 || prev2 === 9)
     var tenth2 = (prev2 === 15 || prev2 === 16)
 
-    var prev3 = solution.notes[pos - 3].harmonic_interval
+    var prev3 = solution.notes[pos - 3].harmonic_interval * dir
     var third3 = (prev3 === 3 || prev3 === 4)
     var sixth3 = (prev3 === 8 || prev3 === 9)
     var tenth3 = (prev3 === 15 || prev3 === 16)
 
-    var next = note.harmonic_interval
+    var next = note.harmonic_interval * dir
     var next3 = (next === 3 || next === 4)
     var next6 = (next === 8 || next === 9)
     var next10 = (next === 15 || next === 16)
@@ -183,7 +187,9 @@ var rule_7 = new Rule(function(note, cantus_firmus, solution) {
             return false
         } 
     } else {
-        return false
+        if (prev_cf < cur_sol || prev_sol > cur_cf) {
+            return false
+        } 
     }
 
     return true
@@ -278,13 +284,13 @@ var rule_11 = new Rule(function(note, cantus_firmus, solution) {
             }
         }
         solution.obliques++
-        if (solution.obliques > 2) {
+        if (solution.obliques > 1) {
             return false
         }
     }
     return true
 
-}, 'Allow tied notes only once or twice throughout', 11)
+}, 'Allow tied notes only once throughout', 11)
 
 var rule_12 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
@@ -296,12 +302,13 @@ var rule_12 = new Rule(function(note, cantus_firmus, solution) {
         return false
     }
     return true 
-}, 'The first interval must be a unison, fifth, or octave', 12)
+}, 'The first interval must be a unison, fifth (only when cf is below), or octave', 12)
 
 var rule_13 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
     
     var choices = generate_major(cantus_firmus[pos].note_number, false)
+    // console.log(choices + ', ' + note.note_number)
     if (choices.includes(note.note_number)) {
         return true
     }

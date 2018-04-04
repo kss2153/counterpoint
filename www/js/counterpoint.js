@@ -83,39 +83,57 @@ class RelativeNote {
     }
 
     norm_harmonic() {
-        return this.harmonic_interval % 12
+        var norm = this.harmonic_interval % 12
+        if (norm < 0) 
+            return norm + 12
+        return norm
     }
 
     norm_note() {
-        return this.note_number % 12
+        var norm = this.note_number % 12
+        if (norm < 0) 
+            return norm + 12
+        return norm
     }
 }
 
 function generate_major(note_number, first_note) {
     // key center: 0
+    var upper = Exercise.upper_cp
     var possible_notes = [ 0, 2, 4, 5, 7, 9, 11 ]
+    // if (!upper)
+    //     possible_notes = [ 0, -2, -4, -5, -7, -9, -11 ]
 
-    if (first_note) {
+    if (first_note && upper) {
         return [0, 7, 12]
+    }
+    if (first_note && !upper) {
+        return [0, -12]
     }
 
     var result = [];
     // P1, P5, P8, ^P5
+    var dir = 1
+    if (!upper) {
+        dir = -1
+    }
     result.push(note_number)
-    result.push(note_number + 7)
-    result.push(note_number + 12)
-    result.push(note_number + 19)
+    result.push(note_number + 7*dir)
+    result.push(note_number + 12*dir)
+    result.push(note_number + 19*dir)
 
     // major 3rd, 6th, 10th
     var rest = [4, 9, 16]
     rest.forEach(function(steps) {
-        var raw = note_number + steps
+        var raw = note_number + steps*dir
         var norm = raw % 12
+        if (norm < 0)
+            norm += 12
         if (possible_notes.includes(norm)) {
             result.push(raw)
         } else {
             // push minor 3rd/6th/10th
-            result.push(raw - 1)
+            result.push(raw - 1*dir)
         }
     })
 
