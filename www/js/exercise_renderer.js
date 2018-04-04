@@ -1,7 +1,9 @@
+var curHorizontalSection = 1;
 var horizontalSections = 10;
 var verticalSections = 25;
 var nextHorizontalSection = 1;
 var inSection = false;
+var inNextSection = false;
 
 var currentNotePoint;
 var currentNoteNum;
@@ -21,10 +23,21 @@ var solutionNums = [];
 var solution_obj = new Solution()
 
 var all_solutions = []
+var fut_notepoints = {}
+var fut_notenums= {}
+var wrongNote = -1
 
 function render_exercise() {
     var canvas = document.getElementById('myCanvas');   
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+    if (nextHorizontalSection > Exercise.cantus_firmus.length || (get_fut_notenums().length == Exercise.cantus_firmus.length && wrongNote==-1)) {
+        var alert = document.getElementById('success')
+        alert.style.visibility = 'visible'
+    } else {
+        var alert = document.getElementById('success')
+        alert.style.visibility = 'hidden'
+    }
 
     var roomForClef = canvas.width * .03;
     leftMargin = canvas.width * .1 + roomForClef;
@@ -32,8 +45,10 @@ function render_exercise() {
     lineSpacing = canvas.height * .02;
     
     drawClef(canvas, bass_clef_image)
-    if (!Exercise.upper_cp)
+    if (!Exercise.upper_cp) {
         drawNotes(solutionPoints, solutionNums, true);
+        drawNotes(get_fut_notepoints(), get_fut_notenums(), true)
+    }
     drawStaffLines(canvas);
     topMargin = canvas.height * .45;
     drawClef(canvas, alto_clef_image)
@@ -41,11 +56,17 @@ function render_exercise() {
     drawStaffLines(canvas);
     topMargin = canvas.height * .3;
     drawClef(canvas, treble_clef_image)
-    if (Exercise.upper_cp)
+    if (Exercise.upper_cp) {
         drawNotes(solutionPoints, solutionNums, true);
+        var np = get_fut_notepoints()
+        var nn = get_fut_notenums()
+        drawNotes(np, nn, true)
+    }
     drawStaffLines(canvas);
     drawBarLines()
     drawBrace(canvas, brace_image)
+
+    drawWrongCircle()
 
     if (Exercise.upper_cp) {
         topMargin = canvas.height * .3;
@@ -130,10 +151,14 @@ function drawNotes(noteArray, numArray, solutionLine) {
         c.beginPath();
         var xPos = noteArray[i].x;
         var yPos = noteArray[i].y;
+        
 	    var radius = noteSpace * (2/3);
         //c.arc(xPos, yPos, radius, 0, 2*Math.PI);
         c.ellipse(xPos, yPos,radius*1.2, radius, 0, 0, 2*Math.PI, false)
         c.fillStyle = "black";
+        // if (solutionLine && i == wrongNote)
+        //     c.fillStyle = "red"
+
         //c.lineWidth = 3
         c.fill();
         c.closePath();
@@ -206,6 +231,13 @@ function drawOffStaffLines(noteNumberFromTop, ctx, centerX, centerY) {
     ctx.closePath();
 }
 
+function add_from_dict() {
+    solutionPoints.push(fut_notepoints[nextHorizontalSection-1]);
+    solutionNums.push(fut_notenums[nextHorizontalSection-1]);
+    delete fut_notepoints[nextHorizontalSection-1]
+    delete fut_notenums[nextHorizontalSection-1]
+}
+
 function staff_click(event) {
     if (!startClick) { return; }
     startClick = false;
@@ -213,19 +245,43 @@ function staff_click(event) {
     var alert = document.getElementById('alert')
     alert.style.visibility = 'hidden'
 
-    if (inSection) {
-        inSection = false;
-        solutionPoints.push(currentNotePoint);
-        solutionNums.push(currentNoteNum);
-        if (check_note()) {
-            state_stack_nums.pop()
-            state_stack_notes.pop()
-            state_stack_points.pop()
+    wrongNote = -1
+
+    if (Exercise.checking) {
+        if (inNextSection && inSection) {
+            inSection = false;
+            solutionPoints.push(currentNotePoint);
+            solutionNums.push(currentNoteNum);
+            if (check_note()) {
+                state_stack_nums.pop()
+                state_stack_notes.pop()
+                state_stack_points.pop()
+                render_exercise()
+                nextHorizontalSection++;
+                while ((nextHorizontalSection-1) in fut_notenums) {
+                    add_from_dict()
+                    if (check_note())
+                        nextHorizontalSection++
+                }
+                render_exercise()
+                persist()            
+            }
+        } else if (inSection) {
+            fut_notenums[curHorizontalSection-1] = currentNoteNum
+            fut_notepoints[curHorizontalSection-1] = currentNotePoint
             render_exercise()
-            nextHorizontalSection++;
-            persist()            
+        }
+    } else {
+        fut_notenums[curHorizontalSection-1] = currentNoteNum
+        fut_notepoints[curHorizontalSection-1] = currentNotePoint
+        render_exercise()
+        if (get_fut_notenums().length == Exercise.cantus_firmus.length) {
+            check_answer()
         }
     }
+
+
+    
     startClick = true;
 }
     
@@ -243,11 +299,21 @@ function staff_hover(event) {
     // check horizontal location of mouse
     var lineLength = canvas.width - 2 * leftMargin; 
     var sectionLength = lineLength / horizontalSections;
-    inSection = (x - leftMargin  > (nextHorizontalSection - 1) * sectionLength) 
+    curHorizontalSection = Math.ceil((x- leftMargin) / sectionLength);
+    if (curHorizontalSection > Exercise.cantus_firmus.length)
+        curHorizontalSection = Exercise.cantus_firmus.length
+    if (curHorizontalSection < 1)
+        curHorizontalSection = 1
+    
+    // inSection = (x - leftMargin  > (nextHorizontalSection - 1) * sectionLength) 
+    //         && (x - leftMargin < nextHorizontalSection * sectionLength)
+        
+    inNextSection = (x - leftMargin  > (nextHorizontalSection - 1) * sectionLength) 
             && (x - leftMargin < nextHorizontalSection * sectionLength)
-
+    inSection = (x - leftMargin  > (curHorizontalSection - 1) * sectionLength) 
+            && (x - leftMargin < curHorizontalSection * sectionLength)
+    // console.log(inNextSection)
     render_exercise()
-
     // check vertical location of mouse
     var noteSpace = lineSpacing / 2;
     if (inSection && y > topMargin - (noteSpace * 6)
@@ -265,7 +331,8 @@ function drawHoverNote(canvas, y) {
 
     var lineLength = canvas.width - 2 * leftMargin - 0.03*canvas.width; 
     var sectionLength = lineLength / horizontalSections;    
-    var centerX = leftMargin + 0.03*canvas.width + (nextHorizontalSection * sectionLength) - (sectionLength * 8 / 10);
+    // var centerX = leftMargin + 0.03*canvas.width + (nextHorizontalSection * sectionLength) - (sectionLength * 8 / 10);
+    var centerX = leftMargin + 0.03*canvas.width + (curHorizontalSection * sectionLength) - (sectionLength * 8 / 10);
     var centerY = noteNumberFromTop * noteSpace + (topMargin - noteSpace); 
 
     currentNotePoint = {x: centerX, y: centerY};
@@ -288,6 +355,32 @@ function getMousePos(canvas, evt) {
         x: Math.floor((evt.clientX-rect.left)/(rect.right-rect.left)*canvas.width),
         y: Math.floor((evt.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height)
     };
+}
+
+function get_fut_notenums() {
+    sorted = []
+    for (var key in fut_notenums) {
+        sorted.push(key)
+    }
+    sorted.sort()
+    result = []
+    for (var i =0; i < sorted.length; i++) {
+        result.push(fut_notenums[sorted[i]])
+    }
+    return result
+}
+
+function get_fut_notepoints() {
+    sorted = []
+    for (var key in fut_notenums) {
+        sorted.push(key)
+    }
+    sorted.sort()
+    result = []
+    for (var i =0; i < sorted.length; i++) {
+        result.push(fut_notepoints[sorted[i]])
+    }
+    return result
 }
 
 
@@ -449,8 +542,8 @@ function check_note(note) {
         solution = convertNumFromTop()
     } else {
         solution  = convertNumFromTopBass()
-        console.log(solution)
     }
+
      
     var idx = solution.length - 1
     var note = solution[idx]
@@ -536,8 +629,11 @@ function reset() {
     solutionNums = []
     solution_obj = new Solution()
     solutionPoints = []
+    fut_notenums = {}
+    fut_notepoints = {}
     persist()
     render_exercise()
+    
 }
 
 function toggle_top(link) {
@@ -549,5 +645,49 @@ function toggle_top(link) {
         Exercise.setUpper()
         reset()
         link.innerHTML = 'upper'
+    }
+    var alert = document.getElementById('alert')
+    alert.style.visibility = 'hidden'
+}
+
+function check_answer() {
+    if (get_fut_notenums().length < Exercise.cantus_firmus.length) {
+        return false
+    }
+    solutionPoints = []
+    solutionNums = []
+    solution_obj = new Solution()
+    var solPoints = get_fut_notepoints()
+    var solNums = get_fut_notenums()
+    for (var i = 0; i < solNums.length; i++) {
+        solutionPoints.push(solPoints[i])
+        solutionNums.push(solNums[i])
+        console.log(solutionPoints)
+        console.log(solutionNums)
+        if (!check_note()) {
+            wrongNote = i;
+            render_exercise()
+            return false
+        }
+    }
+    wrongNote = -1
+    return true
+}
+
+function drawWrongCircle() {
+    if (wrongNote > -1 && get_fut_notenums().length == Exercise.cantus_firmus.length) {
+        var canvas = document.getElementById('myCanvas');  
+        var c = canvas.getContext("2d");
+        c.beginPath()
+        var noteSpace = lineSpacing / 2;
+        var point = get_fut_notepoints()[wrongNote]
+        var radius = noteSpace * 5/3
+        c.strokeStyle = "red"
+        c.lineWidth = 3
+        c.arc(point.x, point.y, radius, 0, 2*Math.PI)
+        c.stroke()
+        c.strokeStyle = "black"
+        c.lineWidth = 1
+        c.closePath()
     }
 }

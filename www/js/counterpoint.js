@@ -9,6 +9,7 @@ var Exercise = new function() {
     this.upper_cp = false
     this.cantus_firmus = []
     this.major = true
+    this.checking = false
 
     this.setUpper = function () {
         this.lower_cp = false

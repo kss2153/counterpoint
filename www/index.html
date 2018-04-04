@@ -42,10 +42,14 @@
                         rules
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
+                        <a class="dropdown-item" href="#">1) Consonances only</a>
+                        <a class="dropdown-item" href="#">2) No similar or parallel motion to a perfect interval</a>
+                        <a class="dropdown-item" href="#">3) No consecutive fifths or octaves by contrary motion.</a>
+                        <a class="dropdown-item" href="#">4) Begin on a unison or octave (or 5th)</a>
+                        <a class="dropdown-item" href="#">5) Penultimate measure must have scale degrees 2 and 7</a>
+                        <a class="dropdown-item" href="#">6) No more than three thirds in a row, same for sixths</a>
+                        <a class="dropdown-item" href="#">7) No voice crossing or overlap</a>
+                        <a class="dropdown-item" href="#">8) The counterpoint should generally adhere to guidelines for the CF</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -53,10 +57,11 @@
                         species
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
+                        <a class="dropdown-item" href="#">first species</a>
+                        <a class="dropdown-item disabled" href="#">second species</a>
+                        <a class="dropdown-item disabled" href="#">third species</a>
+                        <a class="dropdown-item disabled" href="#">fourth species</a>
+                        <a class="dropdown-item disabled" href="#">fifth species</a>
                     </div>
                 </li>
                 <li class="nav-item"><a class="nav-link" href="#" onclick="toggle_top(this)">upper</a></li>
@@ -82,6 +87,11 @@
 
    <div style="visibility:hidden;width:60%;margin:auto;position:fixed;top:10%;left:20%;text-align:center" 
         class="alert alert-danger" role="alert" id="alert">
+    </div>
+
+    <div style="visibility:hidden;width:60%;margin:auto;position:fixed;top:10%;left:20%;text-align:center" 
+        class="alert alert-success" role="alert" id="success">
+        You finished!
     </div>
 
 <!-- 
