@@ -31,12 +31,11 @@ var rule_1 = new Rule(function(note, cantus_firmus, solution) {
     }
 
     var perfects = [0, 7]
+    console.log(note.norm_harmonic())
 
-    if (!perfects.includes(note.harmonic_interval % 12)) {
+    if (!perfects.includes(note.norm_harmonic())) {
         return true
     }
-
-
 
     var dir_sol = (note.note_number - solution.notes[pos - 1].note_number)
     var dir_cf = (cantus_firmus[pos].note_number - 

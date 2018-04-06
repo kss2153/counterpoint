@@ -43,6 +43,18 @@ var Exercise = new function() {
         return result
     }
 
+    this.get_key_signature = function() {
+        var center_norm = this.key_center % 12
+        switch (center_norm) {
+            case 0: return 0; break;
+            case 7: return 1; break;
+            case 2: return 2; break;
+            case 9: return 3; break;
+            case 4: return 4; break;
+            case 11: return 5; break;
+        }
+    }
+
 }
 
 class Solution {

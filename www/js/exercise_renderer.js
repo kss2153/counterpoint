@@ -47,21 +47,22 @@ function render_exercise() {
     drawClef(canvas, bass_clef_image)
     if (!Exercise.upper_cp) {
         drawNotes(solutionPoints, solutionNums, true);
-        drawNotes(get_fut_notepoints(), get_fut_notenums(), true)
+        drawSolutionLine()
     }
+    drawSharps('bass')
     drawStaffLines(canvas);
     topMargin = canvas.height * .45;
     drawClef(canvas, alto_clef_image)
     drawCantusFirmus()
+    drawSharps('alto')
     drawStaffLines(canvas);
     topMargin = canvas.height * .3;
     drawClef(canvas, treble_clef_image)
     if (Exercise.upper_cp) {
         drawNotes(solutionPoints, solutionNums, true);
-        var np = get_fut_notepoints()
-        var nn = get_fut_notenums()
-        drawNotes(np, nn, true)
+        drawSolutionLine()
     }
+    drawSharps('treble')
     drawStaffLines(canvas);
     drawBarLines()
     drawBrace(canvas, brace_image)
@@ -390,7 +391,7 @@ function getNotePoint(noteNumberFromTop, index) {
 
     var lineLength = canvas.width - 2 * leftMargin - 0.03*canvas.width; 
     var sectionLength = lineLength / horizontalSections;    
-    centerX = leftMargin +0.03*canvas.width + ((index + 1) * sectionLength) - (sectionLength * 8 / 10);
+    var centerX = leftMargin +0.03*canvas.width + ((index + 1) * sectionLength) - (sectionLength * 8 / 10);
     var centerY = noteNumberFromTop * noteSpace + (topMargin - noteSpace); 
     return {x: centerX, y: centerY};
 }
@@ -399,7 +400,7 @@ function drawCantusFirmus() {
     notes = Exercise.cantus_firmus
     horizontalSections = notes.length
     points = [];
-    staff_nums = convertToTopAlto(notes);
+    var staff_nums = convertToTopAlto(notes);
     for (var i = 0; i < staff_nums.length; i++) {
         points.push(getNotePoint(staff_nums[i], i));
     }
@@ -408,10 +409,21 @@ function drawCantusFirmus() {
     drawNotes(points, staff_nums, false); 
 }
 
+function drawSolutionLine() {
+    for (var pos in fut_notenums) {
+        pos = parseInt(pos)
+        var tuple = getNotePoint(fut_notenums[pos], pos)
+        fut_notepoints[pos] = tuple
+    }
+    drawNotes(get_fut_notepoints(), get_fut_notenums(), true)
+    return true
+}
+
 function convertToTopAlto(note_list) {
     var converted = [];
     for (var i = 0; i < note_list.length; i++) {
         var num = note_list[i].note_number + Exercise.key_center;
+        num = reverseHelper(num)
         switch (num) {
             case 77: converted.push(-5); break;
             case 76: converted.push(-4); break;
@@ -442,6 +454,7 @@ function convertToTop(note_list) {
     var converted = [];
     for (var i = 0; i < note_list.length; i++) {
         var num = note_list[i].note_number + Exercise.key_center;
+        num = reverseHelper(num)
         switch (num) {
             case 88: converted.push(-5); break;
             case 86: converted.push(-4); break;
@@ -476,29 +489,29 @@ function convertNumFromTop() {
     for (var i = 0; i < noteNums.length; i++) {
         var num = solutionNums[i];
         switch (num) {
-            case -5: converted.push(88); break;
-	        case -4: converted.push(86); break;
-            case -3: converted.push(84); break;
-            case -2: converted.push(83); break;
-            case -1: converted.push(81); break;
-            case 0: converted.push(79); break;
-            case 1: converted.push(77); break;
-            case 2: converted.push(76); break;
-            case 3: converted.push(74); break;
-            case 4: converted.push(72); break;
-            case 5: converted.push(71); break;
-            case 6: converted.push(69); break;
-            case 7: converted.push(67); break;
-            case 8: converted.push(65); break; 
-            case 9: converted.push(64); break;
-            case 10: converted.push(62); break;
-            case 11: converted.push(60); break;
-            case 12: converted.push(59); break;
-            case 13: converted.push(57); break;
-            case 14: converted.push(55); break;
-            case 15: converted.push(53); break;
-            case 16: converted.push(52); break;
-            case 17: converted.push(50); break;
+            case -5: converted.push(topToNumHelper(88)); break;
+	        case -4: converted.push(topToNumHelper(86)); break;
+            case -3: converted.push(topToNumHelper(84)); break;
+            case -2: converted.push(topToNumHelper(83)); break;
+            case -1: converted.push(topToNumHelper(81)); break;
+            case 0: converted.push(topToNumHelper(79)); break;
+            case 1: converted.push(topToNumHelper(77)); break;
+            case 2: converted.push(topToNumHelper(76)); break;
+            case 3: converted.push(topToNumHelper(74)); break;
+            case 4: converted.push(topToNumHelper(72)); break;
+            case 5: converted.push(topToNumHelper(71)); break;
+            case 6: converted.push(topToNumHelper(69)); break;
+            case 7: converted.push(topToNumHelper(67)); break;
+            case 8: converted.push(topToNumHelper(65)); break; 
+            case 9: converted.push(topToNumHelper(64)); break;
+            case 10: converted.push(topToNumHelper(62)); break;
+            case 11: converted.push(topToNumHelper(60)); break;
+            case 12: converted.push(topToNumHelper(59)); break;
+            case 13: converted.push(topToNumHelper(57)); break;
+            case 14: converted.push(topToNumHelper(55)); break;
+            case 15: converted.push(topToNumHelper(53)); break;
+            case 16: converted.push(topToNumHelper(52)); break;
+            case 17: converted.push(topToNumHelper(50)); break;
         }
     }
     return converted;
@@ -508,29 +521,29 @@ function convertNumFromTopBass() {
     for (var i = 0; i < noteNums.length; i++) {
         var num = solutionNums[i];
         switch (num) {
-            case -5: converted.push(67); break;
-	        case -4: converted.push(65); break;
-            case -3: converted.push(64); break;
-            case -2: converted.push(62); break;
-            case -1: converted.push(60); break;
-            case 0: converted.push(59); break;
-            case 1: converted.push(57); break;
-            case 2: converted.push(55); break;
-            case 3: converted.push(53); break;
-            case 4: converted.push(52); break;
-            case 5: converted.push(50); break;
-            case 6: converted.push(48); break;
-            case 7: converted.push(47); break;
-            case 8: converted.push(45); break; 
-            case 9: converted.push(43); break;
-            case 10: converted.push(41); break;
-            case 11: converted.push(40); break;
-            case 12: converted.push(38); break;
-            case 13: converted.push(36); break;
-            case 14: converted.push(35); break;
-            case 15: converted.push(33); break;
-            case 16: converted.push(31); break;
-            case 17: converted.push(29); break;
+            case -5: converted.push(topToNumHelper(67)); break;
+	        case -4: converted.push(topToNumHelper(65)); break;
+            case -3: converted.push(topToNumHelper(64)); break;
+            case -2: converted.push(topToNumHelper(62)); break;
+            case -1: converted.push(topToNumHelper(60)); break;
+            case 0: converted.push(topToNumHelper(59)); break;
+            case 1: converted.push(topToNumHelper(57)); break;
+            case 2: converted.push(topToNumHelper(55)); break;
+            case 3: converted.push(topToNumHelper(53)); break;
+            case 4: converted.push(topToNumHelper(52)); break;
+            case 5: converted.push(topToNumHelper(50)); break;
+            case 6: converted.push(topToNumHelper(48)); break;
+            case 7: converted.push(topToNumHelper(47)); break;
+            case 8: converted.push(topToNumHelper(45)); break; 
+            case 9: converted.push(topToNumHelper(43)); break;
+            case 10: converted.push(topToNumHelper(41)); break;
+            case 11: converted.push(topToNumHelper(40)); break;
+            case 12: converted.push(topToNumHelper(38)); break;
+            case 13: converted.push(topToNumHelper(36)); break;
+            case 14: converted.push(topToNumHelper(35)); break;
+            case 15: converted.push(topToNumHelper(33)); break;
+            case 16: converted.push(topToNumHelper(31)); break;
+            case 17: converted.push(topToNumHelper(29)); break;
         }
     }
     return converted;
@@ -565,7 +578,7 @@ function check_note(note) {
         all_solutions = []
         sol_copy = new Solution()
         sol_copy.copy_prev(solution_obj)
-        search(all_solutions, Exercise.cantus_firmus.length - solution.length, Exercise.cantus_firmus, sol_copy)
+        // search(all_solutions, Exercise.cantus_firmus.length - solution.length, Exercise.cantus_firmus, sol_copy)
         console.log(all_solutions.length)
         return true
     } else {
@@ -689,5 +702,69 @@ function drawWrongCircle() {
         c.strokeStyle = "black"
         c.lineWidth = 1
         c.closePath()
+    }
+}
+
+function topToNumHelper(midi_num) {
+    var key_sig = Exercise.get_key_signature()
+    var norm = midi_num % 12
+    if (key_sig >= 1 && norm == 5)
+        return midi_num+1
+    if (key_sig >= 2 && norm == 0)
+        return midi_num+1
+    if (key_sig >= 3 && norm == 7)
+        return midi_num+1
+    if (key_sig >= 4 && norm == 2)
+        return midi_num+1
+    if (key_sig >= 5 && norm == 9)
+        return midi_num+1
+    return midi_num
+}
+
+function reverseHelper(midi_num) {
+    var key_sig = Exercise.get_key_signature()
+    var norm = midi_num % 12
+    if (key_sig >= 1 && norm == 6)
+        return midi_num-1
+    if (key_sig >= 2 && norm == 1)
+        return midi_num-1
+    if (key_sig >= 3 && norm == 8)
+        return midi_num-1
+    if (key_sig >= 4 && norm == 3)
+        return midi_num-1
+    if (key_sig >= 5 && norm == 10)
+        return midi_num-1
+    return midi_num
+}
+
+function rendersharp(clef, notenum, pos) {
+    var canvas = document.getElementById('myCanvas');
+    var c = canvas.getContext("2d")
+    var noteSpace = lineSpacing / 2
+    var acc_height = lineSpacing * 3/2
+    var acc_width = acc_height * 1/2
+    if (clef == 'bass') notenum += 2
+    if (clef == 'alto') notenum += 1
+    var centerY = notenum * noteSpace + (topMargin - noteSpace)
+    c.drawImage(sharp_image, leftMargin + pos*acc_width/2, 
+        centerY - acc_height/2, acc_width, acc_height)
+}
+
+function drawSharps(clef) {
+    var key_sig = Exercise.get_key_signature()
+    if (key_sig >= 1) {
+        rendersharp(clef, 1, 1)
+    }
+    if (key_sig >= 2) {
+        rendersharp(clef, 4, 2)
+    }
+    if (key_sig >= 3) {
+        rendersharp(clef, 0, 3)
+    }
+    if (key_sig >= 4) {
+        rendersharp(clef, 3, 4)
+    }
+    if (key_sig >= 5) {
+        rendersharp(clef, 6, 5)
     }
 }

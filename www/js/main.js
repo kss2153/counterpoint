@@ -19,6 +19,7 @@ window.onload = window.onresize = function() {
     // draw staff
     var roomForClef = canvas.width * .03
 
+    sharp_image = new Image()
     treble_clef_image = new Image()
     alto_clef_image = new Image()
     bass_clef_image = new Image()
@@ -37,6 +38,10 @@ window.onload = window.onresize = function() {
     }
     brace_image.src = 'images/brace.png'
     brace_image.onload = function() {
+        render_exercise()
+    }
+    sharp_image.src = 'images/sharp.png'
+    sharp_image.onload = function() {
         render_exercise()
     }
 
@@ -63,8 +68,14 @@ function getSolutionPoints() {
 function exercise_setup() {
     var cf = [ 1, 5 , 6, 8,  5, 10, 8, 5, 6, 5, 3, 1 ]
     cf = [60, 62, 64, 65, 67, 64, 65, 62, 60]
+    cf = [59, 61, 63, 64, 66, 63, 64, 61, 59]
+    cf = [62, 64, 66, 67, 69, 66, 67, 64, 62]
     //cf = [ 1, 3, 5, 6, 3, 1]
-    Exercise.setUpper()
+    var t = document.getElementById('toggle')
+    if (t.innerHTML == "upper")
+        Exercise.setUpper()
+    else
+        Exercise.setLower()
     Exercise.inputCF(cf)
 }
 
