@@ -8,7 +8,7 @@ var Exercise = new function() {
     this.lower_cp = false
     this.upper_cp = false
     this.cantus_firmus = []
-    this.major = true
+    this.mode = 1
     this.checking = false
 
     this.setUpper = function () {
@@ -19,6 +19,11 @@ var Exercise = new function() {
     this.setLower = function () {
         this.lower_cp = true
         this.upper_cp = false
+    }
+
+    this.setMode = function (new_mode) {
+        if (new_mode != 1 && new_mode != 6) return
+        this.mode = new_mode
     }
 
     this.inputCF = function(input_note_numbers) {
@@ -44,8 +49,11 @@ var Exercise = new function() {
     }
 
     this.get_key_signature = function() {
-        var center_norm = this.key_center % 12
+        var center_norm = this.key_center
+        if (this.mode == 6) center_norm += 3
+        center_norm = center_norm % 12
         switch (center_norm) {
+            case 5: return -1; break;
             case 0: return 0; break;
             case 7: return 1; break;
             case 2: return 2; break;
@@ -55,6 +63,21 @@ var Exercise = new function() {
         }
     }
 
+}
+
+class Example {
+    constructor(cf, mode) {
+        this.cf = cf
+        this.mode = mode
+    }
+
+    transpose(steps) {
+        var new_cf = []
+        for (var i = 0; i < this.cf.length; i++) {
+            new_cf.push(this.cf[i] + steps)
+        }
+        return new Example(new_cf, this.mode)
+    }
 }
 
 class Solution {
@@ -114,6 +137,8 @@ function generate_major(note_number, first_note) {
     // key center: 0
     var upper = Exercise.upper_cp
     var possible_notes = [ 0, 2, 4, 5, 7, 9, 11 ]
+    if (Exercise.mode == 6)
+        possible_notes = [0, 2, 3, 5, 7, 8, 10]
     // if (!upper)
     //     possible_notes = [ 0, -2, -4, -5, -7, -9, -11 ]
 
@@ -206,20 +231,20 @@ function search(all, length, cantus_firmus, solution) {
 }
 
 
-function main() {
-    var cf = [ 1, 5 , 6, 8,  5, 10, 8, 5, 6, 5, 3, 1 ]
-    cf = [1, 3, 5, 6, 8, 5, 6, 3, 1]
-    //cf = [ 1, 3, 5, 6, 3, 1]
-    Exercise.setUpper()
-    Exercise.inputCF(cf)
+// function main() {
+//     var cf = [ 1, 5 , 6, 8,  5, 10, 8, 5, 6, 5, 3, 1 ]
+//     cf = [1, 3, 5, 6, 8, 5, 6, 3, 1]
+//     //cf = [ 1, 3, 5, 6, 3, 1]
+//     Exercise.setUpper()
+//     Exercise.inputCF(cf)
 
-    console.log(Exercise.cantus_firmus)
-    all = []
-    search(all, Exercise.cantus_firmus.length, Exercise.cantus_firmus, new Solution())
-    console.log('done')
-    all.sort(function(a, b) {
-        console.log(a)
-        return calc_smoothness(b) - calc_smoothness(a)
-    })
-    console.log(all)
-}
+//     console.log(Exercise.cantus_firmus)
+//     all = []
+//     search(all, Exercise.cantus_firmus.length, Exercise.cantus_firmus, new Solution())
+//     console.log('done')
+//     all.sort(function(a, b) {
+//         console.log(a)
+//         return calc_smoothness(b) - calc_smoothness(a)
+//     })
+//     console.log(all)
+// }

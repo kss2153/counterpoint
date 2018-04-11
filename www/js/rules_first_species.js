@@ -305,6 +305,8 @@ var rule_12 = new Rule(function(note, cantus_firmus, solution) {
 
 var rule_13 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
+    if (pos == cantus_firmus.length - 2)
+        return true
     
     var choices = generate_major(cantus_firmus[pos].note_number, false)
     // console.log(choices + ', ' + note.note_number)

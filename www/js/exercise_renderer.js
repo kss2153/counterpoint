@@ -19,6 +19,7 @@ var noteNums = [];
 
 var solutionPoints = [];
 var solutionNums = [];
+var solutionPos = [];
 
 var solution_obj = new Solution()
 
@@ -27,11 +28,15 @@ var fut_notepoints = {}
 var fut_notenums= {}
 var wrongNote = -1
 
+var accidentals = {}
+var writing_acc = 0
+
 function render_exercise() {
     var canvas = document.getElementById('myCanvas');   
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 
-    if (nextHorizontalSection > Exercise.cantus_firmus.length || (get_fut_notenums().length == Exercise.cantus_firmus.length && wrongNote==-1)) {
+    if (nextHorizontalSection > Exercise.cantus_firmus.length || 
+            (get_fut_notenums().length == Exercise.cantus_firmus.length && wrongNote==-1)) {
         var alert = document.getElementById('success')
         alert.style.visibility = 'visible'
     } else {
@@ -157,8 +162,14 @@ function drawNotes(noteArray, numArray, solutionLine) {
         //c.arc(xPos, yPos, radius, 0, 2*Math.PI);
         c.ellipse(xPos, yPos,radius*1.2, radius, 0, 0, 2*Math.PI, false)
         c.fillStyle = "black";
-        // if (solutionLine && i == wrongNote)
-        //     c.fillStyle = "red"
+        if (solutionLine && accidentals[solutionPos[i]] == 1) {
+            c.font = "15px Arial";
+            c.fillText('♯',xPos - noteSpace*2.5,yPos+noteSpace/2);
+        }
+        if (solutionLine && accidentals[solutionPos[i]] == -1) {
+            c.font = "15px Arial";
+            c.fillText('♭',xPos - noteSpace*2.5,yPos+noteSpace/2);
+        }
 
         //c.lineWidth = 3
         c.fill();
@@ -275,6 +286,8 @@ function staff_click(event) {
     } else {
         fut_notenums[curHorizontalSection-1] = currentNoteNum
         fut_notepoints[curHorizontalSection-1] = currentNotePoint
+        solutionPos.push(curHorizontalSection-1)
+        accidentals[curHorizontalSection-1] = writing_acc
         render_exercise()
         if (get_fut_notenums().length == Exercise.cantus_firmus.length) {
             check_answer()
@@ -345,6 +358,12 @@ function drawHoverNote(canvas, y) {
     ctx.arc(centerX, centerY,noteSpace/2,0,2*Math.PI);
     ctx.fillStyle = "red";
     ctx.fill();
+
+    ctx.font = "15px Arial";
+    if (writing_acc == 1)
+        ctx.fillText('♯',centerX - noteSpace*2.5,centerY+noteSpace/2);
+    else if (writing_acc == -1)
+        ctx.fillText('♭',centerX - noteSpace*2.5,centerY+noteSpace/2);
     ctx.closePath();
 }
 
@@ -361,9 +380,10 @@ function getMousePos(canvas, evt) {
 function get_fut_notenums() {
     sorted = []
     for (var key in fut_notenums) {
-        sorted.push(key)
+        sorted.push(parseInt(key))
     }
-    sorted.sort()
+    sorted.sort(function(a, b){return a - b})
+    solutionPos = sorted
     result = []
     for (var i =0; i < sorted.length; i++) {
         result.push(fut_notenums[sorted[i]])
@@ -374,9 +394,9 @@ function get_fut_notenums() {
 function get_fut_notepoints() {
     sorted = []
     for (var key in fut_notenums) {
-        sorted.push(key)
+        sorted.push(parseInt(key))
     }
-    sorted.sort()
+    sorted.sort(function(a, b){return a - b})
     result = []
     for (var i =0; i < sorted.length; i++) {
         result.push(fut_notepoints[sorted[i]])
@@ -486,66 +506,74 @@ function convertToTop(note_list) {
 
 function convertNumFromTop() {
     var converted = [];
-    for (var i = 0; i < noteNums.length; i++) {
+    for (var i = 0; i < solutionNums.length; i++) {
         var num = solutionNums[i];
+        var midi_num;
         switch (num) {
-            case -5: converted.push(topToNumHelper(88)); break;
-	        case -4: converted.push(topToNumHelper(86)); break;
-            case -3: converted.push(topToNumHelper(84)); break;
-            case -2: converted.push(topToNumHelper(83)); break;
-            case -1: converted.push(topToNumHelper(81)); break;
-            case 0: converted.push(topToNumHelper(79)); break;
-            case 1: converted.push(topToNumHelper(77)); break;
-            case 2: converted.push(topToNumHelper(76)); break;
-            case 3: converted.push(topToNumHelper(74)); break;
-            case 4: converted.push(topToNumHelper(72)); break;
-            case 5: converted.push(topToNumHelper(71)); break;
-            case 6: converted.push(topToNumHelper(69)); break;
-            case 7: converted.push(topToNumHelper(67)); break;
-            case 8: converted.push(topToNumHelper(65)); break; 
-            case 9: converted.push(topToNumHelper(64)); break;
-            case 10: converted.push(topToNumHelper(62)); break;
-            case 11: converted.push(topToNumHelper(60)); break;
-            case 12: converted.push(topToNumHelper(59)); break;
-            case 13: converted.push(topToNumHelper(57)); break;
-            case 14: converted.push(topToNumHelper(55)); break;
-            case 15: converted.push(topToNumHelper(53)); break;
-            case 16: converted.push(topToNumHelper(52)); break;
-            case 17: converted.push(topToNumHelper(50)); break;
+            case -5: midi_num = 87; break;
+	        case -4: midi_num = 86; break;
+            case -3: midi_num = 84; break;
+            case -2: midi_num = 83; break;
+            case -1: midi_num = 81; break;
+            case 0: midi_num = 79; break;
+            case 1: midi_num = 77; break;
+            case 2: midi_num = 76; break;
+            case 3: midi_num = 74; break;
+            case 4: midi_num = 72; break;
+            case 5: midi_num = 71; break;
+            case 6: midi_num = 69; break;
+            case 7: midi_num = 67; break;
+            case 8: midi_num = 65; break; 
+            case 9: midi_num = 64; break;
+            case 10: midi_num = 62; break;
+            case 11: midi_num = 60; break;
+            case 12: midi_num = 59; break;
+            case 13: midi_num = 57; break;
+            case 14: midi_num = 55; break;
+            case 15: midi_num = 53; break;
+            case 16: midi_num = 52; break;
+            case 17: midi_num = 50; break;
         }
+        midi_num += accidentals[i]
+        converted.push(topToNumHelper(midi_num))
     }
+    console.log(converted)
     return converted;
 }
 function convertNumFromTopBass() {
     var converted = [];
-    for (var i = 0; i < noteNums.length; i++) {
+    for (var i = 0; i < solutionNums.length; i++) {
         var num = solutionNums[i];
+        var midi_num;
         switch (num) {
-            case -5: converted.push(topToNumHelper(67)); break;
-	        case -4: converted.push(topToNumHelper(65)); break;
-            case -3: converted.push(topToNumHelper(64)); break;
-            case -2: converted.push(topToNumHelper(62)); break;
-            case -1: converted.push(topToNumHelper(60)); break;
-            case 0: converted.push(topToNumHelper(59)); break;
-            case 1: converted.push(topToNumHelper(57)); break;
-            case 2: converted.push(topToNumHelper(55)); break;
-            case 3: converted.push(topToNumHelper(53)); break;
-            case 4: converted.push(topToNumHelper(52)); break;
-            case 5: converted.push(topToNumHelper(50)); break;
-            case 6: converted.push(topToNumHelper(48)); break;
-            case 7: converted.push(topToNumHelper(47)); break;
-            case 8: converted.push(topToNumHelper(45)); break; 
-            case 9: converted.push(topToNumHelper(43)); break;
-            case 10: converted.push(topToNumHelper(41)); break;
-            case 11: converted.push(topToNumHelper(40)); break;
-            case 12: converted.push(topToNumHelper(38)); break;
-            case 13: converted.push(topToNumHelper(36)); break;
-            case 14: converted.push(topToNumHelper(35)); break;
-            case 15: converted.push(topToNumHelper(33)); break;
-            case 16: converted.push(topToNumHelper(31)); break;
-            case 17: converted.push(topToNumHelper(29)); break;
+            case -5: midi_num = 67; break;
+	        case -4: midi_num = 65; break;
+            case -3: midi_num = 64; break;
+            case -2: midi_num = 62; break;
+            case -1: midi_num = 60; break;
+            case 0: midi_num = 59; break;
+            case 1: midi_num = 57; break;
+            case 2: midi_num = 55; break;
+            case 3: midi_num = 53; break;
+            case 4: midi_num = 52; break;
+            case 5: midi_num = 50; break;
+            case 6: midi_num = 48; break;
+            case 7: midi_num = 47; break;
+            case 8: midi_num = 45; break; 
+            case 9: midi_num = 43; break;
+            case 10: midi_num = 41; break;
+            case 11: midi_num = 40; break;
+            case 12: midi_num = 38; break;
+            case 13: midi_num = 36; break;
+            case 14: midi_num = 35; break;
+            case 15: midi_num = 33; break;
+            case 16: midi_num = 31; break;
+            case 17: midi_num = 29; break;
         }
+        midi_num += accidentals[i]
+        converted.push(topToNumHelper(midi_num)) 
     }
+
     return converted;
 }
 
@@ -642,6 +670,7 @@ function reset() {
     solutionNums = []
     solution_obj = new Solution()
     solutionPoints = []
+    solutionPos = []
     fut_notenums = {}
     fut_notepoints = {}
     persist()
@@ -708,6 +737,7 @@ function drawWrongCircle() {
 function topToNumHelper(midi_num) {
     var key_sig = Exercise.get_key_signature()
     var norm = midi_num % 12
+    // sharps
     if (key_sig >= 1 && norm == 5)
         return midi_num+1
     if (key_sig >= 2 && norm == 0)
@@ -718,12 +748,17 @@ function topToNumHelper(midi_num) {
         return midi_num+1
     if (key_sig >= 5 && norm == 9)
         return midi_num+1
+    
+    // flats
+    if (key_sig <= -1 && norm == 11)
+        return midi_num-1
     return midi_num
 }
 
 function reverseHelper(midi_num) {
     var key_sig = Exercise.get_key_signature()
     var norm = midi_num % 12
+    // sharps
     if (key_sig >= 1 && norm == 6)
         return midi_num-1
     if (key_sig >= 2 && norm == 1)
@@ -734,10 +769,14 @@ function reverseHelper(midi_num) {
         return midi_num-1
     if (key_sig >= 5 && norm == 10)
         return midi_num-1
+
+    // flats
+    if (key_sig <= -1 && norm == 10)
+        return midi_num+1
     return midi_num
 }
 
-function rendersharp(clef, notenum, pos) {
+function renderAccidental(clef, notenum, pos, image) {
     var canvas = document.getElementById('myCanvas');
     var c = canvas.getContext("2d")
     var noteSpace = lineSpacing / 2
@@ -746,8 +785,16 @@ function rendersharp(clef, notenum, pos) {
     if (clef == 'bass') notenum += 2
     if (clef == 'alto') notenum += 1
     var centerY = notenum * noteSpace + (topMargin - noteSpace)
-    c.drawImage(sharp_image, leftMargin + pos*acc_width/2, 
+    c.drawImage(image, leftMargin + pos*acc_width/2, 
         centerY - acc_height/2, acc_width, acc_height)
+}
+
+function rendersharp(clef, notenum, pos) {
+    renderAccidental(clef, notenum, pos, sharp_image)
+}
+
+function renderFlat(clef, notenum, pos) {
+    renderAccidental(clef, notenum, pos, flat_image)
 }
 
 function drawSharps(clef) {
@@ -766,5 +813,8 @@ function drawSharps(clef) {
     }
     if (key_sig >= 5) {
         rendersharp(clef, 6, 5)
+    }
+    if (key_sig <= -1) {
+        renderFlat(clef, 5, 1)
     }
 }

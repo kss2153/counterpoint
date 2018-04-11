@@ -24,6 +24,21 @@ window.onload = window.onresize = function() {
     alto_clef_image = new Image()
     bass_clef_image = new Image()
     brace_image = new Image()
+    flat_image = new Image()
+    loadImages()
+
+    var load = JSON.parse(localStorage.getItem('state'));
+    if (load) {
+        render_exercise()
+        solution_obj = load['solution']
+        solutionNums = load['nums']
+        solutionPoints = getSolutionPoints()
+        nextHorizontalSection = load['next']
+        render_exercise()
+    }
+}
+
+function loadImages() {
     treble_clef_image.src = 'images/treble_clef.png'
     treble_clef_image.onload = function() {
         render_exercise()
@@ -44,15 +59,8 @@ window.onload = window.onresize = function() {
     sharp_image.onload = function() {
         render_exercise()
     }
-
-
-    var load = JSON.parse(localStorage.getItem('state'));
-    if (load) {
-        render_exercise()
-        solution_obj = load['solution']
-        solutionNums = load['nums']
-        solutionPoints = getSolutionPoints()
-        nextHorizontalSection = load['next']
+    flat_image.src = 'images/flat.png'
+    flat_image.onload = function() {
         render_exercise()
     }
 }
@@ -64,18 +72,24 @@ function getSolutionPoints() {
     }
     return result
 } 
-
+cf_major = [59, 61, 63, 64, 66, 63, 64, 61, 59]
+cf_minor = [57, 60, 59, 62, 60, 64, 65, 64, 62, 60, 59, 57]
+cf_3 = [57, 59, 60, 59, 57]
+ex1 = new Example(cf_3, 6)
+ex2 = new Example(cf_major, 1)
+ex = ex1
 function exercise_setup() {
     var cf = [ 1, 5 , 6, 8,  5, 10, 8, 5, 6, 5, 3, 1 ]
     cf = [60, 62, 64, 65, 67, 64, 65, 62, 60]
-    cf = [59, 61, 63, 64, 66, 63, 64, 61, 59]
-    cf = [62, 64, 66, 67, 69, 66, 67, 64, 62]
+    
+    // cf = [65, 67, 69, 70, 72, 69, 70, 67, 65]
     //cf = [ 1, 3, 5, 6, 3, 1]
     var t = document.getElementById('toggle')
     if (t.innerHTML == "upper")
         Exercise.setUpper()
     else
         Exercise.setLower()
-    Exercise.inputCF(cf)
+    Exercise.inputCF(ex.cf)
+    Exercise.setMode(ex.mode)
 }
 
