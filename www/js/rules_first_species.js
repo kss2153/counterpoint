@@ -81,15 +81,22 @@ var rule_3 = new Rule(function(note, cantus_firmus, solution) {
     if (pos != cantus_firmus.length - 2) {
         return true
     }
+    var seven = 11
+    if (Exercise.mode == 2 || Exercise.mode == 3 || Exercise.mode == 5 || Exercise.mode == 7)
+        seven = 10
+    
+    var two = 2
+    if (Exercise.mode == 3 || Exercise.mode == 7)
+        two = 1
 
     var cf_note = cantus_firmus[pos].norm_note()
     var sol_note = note.norm_note()
 
-    if (cf_note === 11 && sol_note === 2) {
+    if (cf_note === seven && sol_note === two) {
         return true
     }
 
-    if (cf_note === 2 && sol_note === 11) {
+    if (cf_note === two && sol_note === seven) {
         return true
     }
 
@@ -110,10 +117,10 @@ var rule_4 = new Rule(function(note, cantus_firmus, solution) {
     }
 
     // check smoothness - probably will become unnecessary with later rules
-    var prev_note = solution.notes[pos - 1].note_number
-    if (note.note_number - 1 != prev_note && note.note_number + 2 != prev_note) {
-        return false
-    }
+    // var prev_note = solution.notes[pos - 1].note_number
+    // if (note.note_number - 1 != prev_note && note.note_number + 2 != prev_note) {
+    //     return false
+    // }
 
     return true
 
@@ -318,6 +325,18 @@ var rule_13 = new Rule(function(note, cantus_firmus, solution) {
     
 }, 'This interval is a dissonance', 13)
 
+var rule_14 = new Rule(function(note, cantus_firmus, solution) {
+    pos = solution.notes.length
+    if (pos == 0) {
+        return true
+    }
+    if (note.melodic_interval == 6 || note.melodic_interval == -6) {
+        return false
+    }
+    return true
+
+}, 'Avoid melodic tritones', 14)
+
 function run_checks(note, cantus_firmus, solution) {
     if (check_helper(rule_1, note, cantus_firmus, solution) &&
         check_helper(rule_2, note, cantus_firmus, solution) &&
@@ -331,7 +350,8 @@ function run_checks(note, cantus_firmus, solution) {
         check_helper(rule_10, note, cantus_firmus, solution) &&
         check_helper(rule_11, note, cantus_firmus, solution) &&
         check_helper(rule_12, note, cantus_firmus, solution) &&
-        check_helper(rule_13, note, cantus_firmus, solution))
+        check_helper(rule_13, note, cantus_firmus, solution) &&
+        check_helper(rule_14, note, cantus_firmus, solution))
     return true
 }
 

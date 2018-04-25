@@ -103,7 +103,19 @@
     <div style="font-size:40px;position:fixed;top:10%;left:90%">
         <a href="#" onclick="if (writing_acc != 1) {writing_acc=1} else {writing_acc = 0}">&#9839</a>
         <a href="#" onclick="if (writing_acc != -1) {writing_acc=-1} else {writing_acc = 0}">&#9837</a>
+        <a href="#" onclick="if (writing_acc != 2) {writing_acc=2} else {writing_acc = 0}">&#9838</a>
     </div>
+
+    <div style="font-size:40px;position:fixed;top:80%;left:90%">
+        <button onclick="nextCF(1)"><</button>
+        <button onclick="nextCF(2)">></button>
+    </div>
+
+    <div style="position:fixed;top:45%;left:90%">
+        <button style="visibility:hidden" id="submit" onclick="check_answer()">check</button>
+    </div>
+
+    <div id="mode" style="font-size:40px;position:fixed;top:80%;left:10%"></div>
 
     <div style="position: fixed; bottom: 0px; width: 100%;">
         <div style="text-align: center">by Kayvon Seif-Naraghi</div>

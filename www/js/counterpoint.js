@@ -11,6 +11,11 @@ var Exercise = new function() {
     this.mode = 1
     this.checking = false
 
+    this.beginning = false
+    this.climax = false
+    this.end = false
+    this.entire = false
+
     this.setUpper = function () {
         this.lower_cp = false
         this.upper_cp = true
@@ -22,7 +27,7 @@ var Exercise = new function() {
     }
 
     this.setMode = function (new_mode) {
-        if (new_mode != 1 && new_mode != 6) return
+        if (new_mode < 1 || new_mode > 7) return
         this.mode = new_mode
     }
 
@@ -48,11 +53,35 @@ var Exercise = new function() {
         return result
     }
 
+    this.get_mode_name = function() {
+        var name = ''
+        switch (this.mode) {
+            case 1: name = 'major'; break;
+            case 2: name = 'dorian'; break;
+            case 3: name = 'phrygian'; break;
+            case 4: name = 'lydian'; break;
+            case 5: name = 'mixolydian'; break;
+            case 6: name = 'minor'; break;
+            case 7: name = 'locrian'; break;
+        }
+        return name
+    }
+
     this.get_key_signature = function() {
         var center_norm = this.key_center
+        if (this.mode == 2) center_norm -= 2
+        if (this.mode == 3) center_norm -= 4
+        if (this.mode == 4) center_norm -= 5
+        if (this.mode == 5) center_norm += 5
         if (this.mode == 6) center_norm += 3
+        if (this.mode == 7) center_norm += 1
         center_norm = center_norm % 12
         switch (center_norm) {
+            case 6: return -6; break;
+            case 1: return -5; break;
+            case 8: return -4; break;
+            case 3: return -3; break;
+            case 10: return -2; break;
             case 5: return -1; break;
             case 0: return 0; break;
             case 7: return 1; break;
@@ -139,6 +168,20 @@ function generate_major(note_number, first_note) {
     var possible_notes = [ 0, 2, 4, 5, 7, 9, 11 ]
     if (Exercise.mode == 6)
         possible_notes = [0, 2, 3, 5, 7, 8, 10]
+    else if (Exercise.mode == 2)
+        possible_notes = [0, 2, 3, 5, 6, 7, 9, 10]
+    else if (Exercise.mode == 3)
+        possible_notes = [0, 1, 3, 5, 7, 8, 10]
+    else if (Exercise.mode == 4)
+        possible_notes = [0, 2, 4, 6, 7, 9, 11]
+    else if (Exercise.mode == 5)
+        possible_notes = [0, 2, 4, 5, 7, 9, 10]
+    else if (Exercise.mode == 7)
+        possible_notes = [0, 1, 3, 5, 6, 8, 10]
+
+    
+
+
     // if (!upper)
     //     possible_notes = [ 0, -2, -4, -5, -7, -9, -11 ]
 
@@ -229,22 +272,3 @@ function search(all, length, cantus_firmus, solution) {
         }
     }
 }
-
-
-// function main() {
-//     var cf = [ 1, 5 , 6, 8,  5, 10, 8, 5, 6, 5, 3, 1 ]
-//     cf = [1, 3, 5, 6, 8, 5, 6, 3, 1]
-//     //cf = [ 1, 3, 5, 6, 3, 1]
-//     Exercise.setUpper()
-//     Exercise.inputCF(cf)
-
-//     console.log(Exercise.cantus_firmus)
-//     all = []
-//     search(all, Exercise.cantus_firmus.length, Exercise.cantus_firmus, new Solution())
-//     console.log('done')
-//     all.sort(function(a, b) {
-//         console.log(a)
-//         return calc_smoothness(b) - calc_smoothness(a)
-//     })
-//     console.log(all)
-// }

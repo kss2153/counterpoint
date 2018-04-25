@@ -72,12 +72,8 @@ function getSolutionPoints() {
     }
     return result
 } 
-cf_major = [59, 61, 63, 64, 66, 63, 64, 61, 59]
-cf_minor = [57, 60, 59, 62, 60, 64, 65, 64, 62, 60, 59, 57]
-cf_3 = [57, 59, 60, 59, 57]
-ex1 = new Example(cf_3, 6)
-ex2 = new Example(cf_major, 1)
-ex = ex1
+
+cur_example = 0
 function exercise_setup() {
     var cf = [ 1, 5 , 6, 8,  5, 10, 8, 5, 6, 5, 3, 1 ]
     cf = [60, 62, 64, 65, 67, 64, 65, 62, 60]
@@ -89,7 +85,77 @@ function exercise_setup() {
         Exercise.setUpper()
     else
         Exercise.setLower()
+
+    ex = examples[cur_example]
+    // var ex = new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 2)
+    // ex = new Example([64, 60, 62, 60, 57, 69, 67, 64, 65, 64], 3)
+    // ex = new Example([55, 62, 60, 57, 59, 60, 59, 57, 55], 5)
     Exercise.inputCF(ex.cf)
     Exercise.setMode(ex.mode)
+    document.getElementById('mode').innerHTML = Exercise.get_mode_name()
 }
+
+CANTUS_FIRMI = [
+
+    new Example([60, 62, 65, 64, 65, 67, 69, 67, 64, 62, 60], 1), // SCHENKER 1
+    new Example([60, 62, 64, 65, 67, 62, 65, 64, 62, 60], 1), // SCHENKER 1
+    new Example([62, 67, 66, 71, 69, 66, 67, 66, 64, 62], 1), // S&S 1
+    new Example([58, 62, 60, 67, 65, 62, 63, 62, 60, 58], 1), // S&S 1
+    new Example([65, 67, 69, 65, 62, 64, 65, 72, 69, 65, 67, 65], 1), // FUX 1
+    new Example([57, 59, 61, 66, 64, 57, 59, 62, 61, 59, 57], 1), // S&S 1
+
+    new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 2),
+
+    new Example([64, 60, 62, 60, 57, 69, 67, 64, 65, 64], 3),
+
+
+    new Example([55, 62, 60, 57, 59, 60, 59, 57, 55], 5),
+
+    new Example([62, 65, 64, 62, 67, 65, 69, 67, 65, 64, 62], 6), // FUX 6
+    new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 6), // JEPPESEN 6
+    new Example([55, 62, 60, 63, 62, 58, 60, 58, 57, 55], 6), // S&S 6
+    new Example([57, 60, 59, 60, 62, 64, 60, 59, 57], 6), // S&S 6
+    new Example([59, 54, 57, 55, 54, 62, 61, 59], 6), // S&S 6
+    new Example([60, 62, 65, 63, 68, 67, 65, 62, 63, 62, 60], 6), // S&S 6
+
+
+]
+
+
+
+
+examples = []
+for (var i = 0; i < CANTUS_FIRMI.length; i++) {
+    var e = CANTUS_FIRMI[i]
+    for (var j = -6; j < 6; j++) {
+        examples.push(e.transpose(j))
+    }
+}
+
+function nextCF(num) {
+    if (num == 1 && cur_example > 0)
+        cur_example -= 1
+    if (num == 2 && cur_example < examples.length-1)
+        cur_example += 1
+    
+    reset()
+    exercise_setup()
+    render_exercise()
+}
+
+function shuffle(arra1) {
+    let ctr = arra1.length;
+    let temp;
+    let index;
+
+    while (ctr > 0) {
+        index = Math.floor(Math.random() * ctr);
+        ctr--;
+        temp = arra1[ctr];
+        arra1[ctr] = arra1[index];
+        arra1[index] = temp;
+    }
+    return arra1;
+}
+examples = shuffle(examples)
 

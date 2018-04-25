@@ -31,12 +31,15 @@ var wrongNote = -1
 var accidentals = {}
 var writing_acc = 0
 
+var submitted = false
+
 function render_exercise() {
     var canvas = document.getElementById('myCanvas');   
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 
     if (nextHorizontalSection > Exercise.cantus_firmus.length || 
-            (get_fut_notenums().length == Exercise.cantus_firmus.length && wrongNote==-1)) {
+            (get_fut_notenums().length == Exercise.cantus_firmus.length && wrongNote==-1) 
+            && submitted) {
         var alert = document.getElementById('success')
         alert.style.visibility = 'visible'
     } else {
@@ -170,6 +173,10 @@ function drawNotes(noteArray, numArray, solutionLine) {
             c.font = "15px Arial";
             c.fillText('♭',xPos - noteSpace*2.5,yPos+noteSpace/2);
         }
+        if (solutionLine && accidentals[solutionPos[i]] == 2) {
+            c.font = "15px Arial";
+            c.fillText('♮',xPos - noteSpace*2.5,yPos+noteSpace/2);
+        }
 
         //c.lineWidth = 3
         c.fill();
@@ -253,6 +260,7 @@ function add_from_dict() {
 function staff_click(event) {
     if (!startClick) { return; }
     startClick = false;
+    submitted = false;
 
     var alert = document.getElementById('alert')
     alert.style.visibility = 'hidden'
@@ -290,7 +298,8 @@ function staff_click(event) {
         accidentals[curHorizontalSection-1] = writing_acc
         render_exercise()
         if (get_fut_notenums().length == Exercise.cantus_firmus.length) {
-            check_answer()
+            showSubmitButton()
+            // check_answer()
         }
     }
 
@@ -364,6 +373,8 @@ function drawHoverNote(canvas, y) {
         ctx.fillText('♯',centerX - noteSpace*2.5,centerY+noteSpace/2);
     else if (writing_acc == -1)
         ctx.fillText('♭',centerX - noteSpace*2.5,centerY+noteSpace/2);
+    else if (writing_acc == 2)
+        ctx.fillText('♮',centerX - noteSpace*2.5,centerY+noteSpace/2);
     ctx.closePath();
 }
 
@@ -534,10 +545,13 @@ function convertNumFromTop() {
             case 16: midi_num = 52; break;
             case 17: midi_num = 50; break;
         }
-        midi_num += accidentals[i]
-        converted.push(topToNumHelper(midi_num))
+        if (accidentals[i] != 2) {
+            midi_num += accidentals[i]
+            converted.push(topToNumHelper(midi_num))
+        } else {
+            converted.push(midi_num)
+        }
     }
-    console.log(converted)
     return converted;
 }
 function convertNumFromTopBass() {
@@ -570,8 +584,12 @@ function convertNumFromTopBass() {
             case 16: midi_num = 31; break;
             case 17: midi_num = 29; break;
         }
-        midi_num += accidentals[i]
-        converted.push(topToNumHelper(midi_num)) 
+        if (accidentals[i] != 2) {
+            midi_num += accidentals[i]
+            converted.push(topToNumHelper(midi_num))
+        } else {
+            converted.push(midi_num)
+        } 
     }
 
     return converted;
@@ -675,7 +693,8 @@ function reset() {
     fut_notepoints = {}
     persist()
     render_exercise()
-    
+    document.getElementById('submit').style.visibility = 'hidden'
+    document.getElementById('alert').style.visibility = 'hidden'
 }
 
 function toggle_top(link) {
@@ -692,7 +711,14 @@ function toggle_top(link) {
     alert.style.visibility = 'hidden'
 }
 
+function showSubmitButton() {
+    var submitButton = document.getElementById('submit')
+    submitButton.style.visibility = 'visible'
+}
+
 function check_answer() {
+    submitted = true;
+    document.getElementById('submit').style.visibility = 'hidden'
     if (get_fut_notenums().length < Exercise.cantus_firmus.length) {
         return false
     }
@@ -708,6 +734,9 @@ function check_answer() {
         console.log(solutionNums)
         if (!check_note()) {
             wrongNote = i;
+            solutionPoints = []
+            solutionNums = []
+            solution_obj = new Solution()
             render_exercise()
             return false
         }
@@ -752,6 +781,16 @@ function topToNumHelper(midi_num) {
     // flats
     if (key_sig <= -1 && norm == 11)
         return midi_num-1
+    if (key_sig <= -2 && norm == 4)
+        return midi_num-1
+    if (key_sig <= -3 && norm == 9)
+        return midi_num-1
+    if (key_sig <= -4 && norm == 2)
+        return midi_num-1
+    if (key_sig <= -5 && norm == 7)
+        return midi_num-1
+    if (key_sig <= -6 && norm == 0)
+        return midi_num-1
     return midi_num
 }
 
@@ -772,6 +811,16 @@ function reverseHelper(midi_num) {
 
     // flats
     if (key_sig <= -1 && norm == 10)
+        return midi_num+1
+    if (key_sig <= -2 && norm == 3)
+        return midi_num+1
+    if (key_sig <= -3 && norm == 8)
+        return midi_num+1
+    if (key_sig <= -4 && norm == 1)
+        return midi_num+1
+    if (key_sig <= -5 && norm == 6)
+        return midi_num+1
+    if (key_sig <= -6 && norm == 11)
         return midi_num+1
     return midi_num
 }
@@ -816,5 +865,20 @@ function drawSharps(clef) {
     }
     if (key_sig <= -1) {
         renderFlat(clef, 5, 1)
+    }
+    if (key_sig <= -2) {
+        renderFlat(clef, 2, 2)
+    }
+    if (key_sig <= -3) {
+        renderFlat(clef, 6, 3)
+    }
+    if (key_sig <= -4) {
+        renderFlat(clef, 3, 4)
+    }
+    if (key_sig <= -5) {
+        renderFlat(clef, 7, 5)
+    }
+    if (key_sig <= -6) {
+        renderFlat(clef, 4, 6)
     }
 }
