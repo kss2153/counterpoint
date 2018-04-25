@@ -75,6 +75,7 @@ function getSolutionPoints() {
 
 cur_example = 0
 function exercise_setup() {
+    document.getElementById('0').style.color = "black"
     var cf = [ 1, 5 , 6, 8,  5, 10, 8, 5, 6, 5, 3, 1 ]
     cf = [60, 62, 64, 65, 67, 64, 65, 62, 60]
     
@@ -104,12 +105,12 @@ CANTUS_FIRMI = [
     new Example([65, 67, 69, 65, 62, 64, 65, 72, 69, 65, 67, 65], 1), // FUX 1
     new Example([57, 59, 61, 66, 64, 57, 59, 62, 61, 59, 57], 1), // S&S 1
 
-    new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 2),
+    new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 2), // S&S
 
-    new Example([64, 60, 62, 60, 57, 69, 67, 64, 65, 64], 3),
+    new Example([64, 60, 62, 60, 57, 69, 67, 64, 65, 64], 3), // S&S
 
 
-    new Example([55, 62, 60, 57, 59, 60, 59, 57, 55], 5),
+    new Example([55, 62, 60, 57, 59, 60, 59, 57, 55], 5), // S&S
 
     new Example([62, 65, 64, 62, 67, 65, 69, 67, 65, 64, 62], 6), // FUX 6
     new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 6), // JEPPESEN 6
@@ -141,6 +142,35 @@ function nextCF(num) {
     reset()
     exercise_setup()
     render_exercise()
+}
+
+function setExerciseRange(num) {
+    for (var i = 0; i < 4; i++)
+        document.getElementById(i+'').style.color = 'white'
+    document.getElementById(num+'').style.color = 'black'
+
+    var instr = document.getElementById('instruction')
+    switch (num) {
+        case 0: instr.innerHTML = 'complete the entire exercise'; break;
+        case 1: instr.innerHTML = 'complete the first three notes'; break;
+        case 2: instr.innerHTML = 'complete three notes with the climax in the middle'; break;
+        case 3: instr.innerHTML = 'complete the final three notes'; break;
+    }
+    Exercise.set_range(num)
+    reset()
+    exercise_setup()
+    render_exercise()
+}
+
+function switchAccButton(num) {
+    var button = document.getElementById('acc_'+num)
+    var active = button.classList.contains('active')
+    nums = [1, -1, 2]
+    for (var i = 0; i < nums.length; i++) {
+        document.getElementById('acc_'+nums[i]).classList.remove('active')
+    }
+    if (!active) 
+        button.classList.add('active')
 }
 
 function shuffle(arra1) {

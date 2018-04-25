@@ -14,7 +14,7 @@ var Exercise = new function() {
     this.beginning = false
     this.climax = false
     this.end = false
-    this.entire = false
+    this.entire = true
 
     this.setUpper = function () {
         this.lower_cp = false
@@ -89,6 +89,20 @@ var Exercise = new function() {
             case 9: return 3; break;
             case 4: return 4; break;
             case 11: return 5; break;
+        }
+    }
+
+    this.set_range = function(part) {
+        this.entire = false
+        this.beginning = false
+        this.climax = false
+        this.end = false
+        switch (part) {
+            case 0: this.entire = true; break;
+            case 1: this.beginning = true; break;
+            case 2: this.climax = true; break;
+            case 3: this.end = true; break;
+            default: this.entire = true; break;
         }
     }
 

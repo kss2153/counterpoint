@@ -26,7 +26,7 @@ class Rule {
 var rule_1 = new Rule(function(note, cantus_firmus, solution) {
     
     pos = solution.notes.length
-    if (pos == 0) {
+    if (pos == 0 || solution.notes[pos - 1] == undefined) {
         return true
     }
 
@@ -59,7 +59,7 @@ var rule_1 = new Rule(function(note, cantus_firmus, solution) {
 // to be checked after rule 1
 var rule_2 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
-    if (pos === 0) {
+    if (pos === 0 || solution.notes[pos - 1] == undefined) {
         return true
     }
 
@@ -141,7 +141,7 @@ var rule_5 = new Rule(function(note, cantus_firmus, solution) {
 
 var rule_6 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
-    if (pos < 3) {
+    if (pos < 3 || !Exercise.entire) {
         return true
     }
     var dir = 1
@@ -179,7 +179,7 @@ var rule_6 = new Rule(function(note, cantus_firmus, solution) {
 
 var rule_7 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
-    if (pos === 0) {
+    if (pos === 0 || solution.notes[pos - 1] == undefined) {
         return true
     }
 
@@ -204,7 +204,7 @@ var rule_7 = new Rule(function(note, cantus_firmus, solution) {
 
 var rule_8 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
-    if (pos < 2) {
+    if (pos < 2 || solution.notes[pos - 1] == undefined) {
         return true
     }
 
@@ -233,7 +233,7 @@ var rule_8 = new Rule(function(note, cantus_firmus, solution) {
 
 var rule_9 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
-    if (pos < 4) {
+    if (pos < 4 || solution.notes[pos - 2] == undefined) {
         return true
     }
 
@@ -254,7 +254,7 @@ var rule_9 = new Rule(function(note, cantus_firmus, solution) {
 
 var rule_10 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
-    if (pos < 6) {
+    if (pos < 6 || !Exercise.entire) {
         return true
     }
 
@@ -278,7 +278,7 @@ var rule_10 = new Rule(function(note, cantus_firmus, solution) {
 
 var rule_11 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
-    if (pos === 0) {
+    if (pos === 0 || solution.notes[pos - 2] == undefined) {
         return true
     }
 
@@ -327,7 +327,7 @@ var rule_13 = new Rule(function(note, cantus_firmus, solution) {
 
 var rule_14 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
-    if (pos == 0) {
+    if (pos == 0 || solution.notes[pos - 1] == undefined) {
         return true
     }
     if (note.melodic_interval == 6 || note.melodic_interval == -6) {
@@ -337,22 +337,57 @@ var rule_14 = new Rule(function(note, cantus_firmus, solution) {
 
 }, 'Avoid melodic tritones', 14)
 
-function run_checks(note, cantus_firmus, solution) {
-    if (check_helper(rule_1, note, cantus_firmus, solution) &&
-        check_helper(rule_2, note, cantus_firmus, solution) &&
-        check_helper(rule_3, note, cantus_firmus, solution) &&
-        check_helper(rule_4, note, cantus_firmus, solution) &&
-        check_helper(rule_5, note, cantus_firmus, solution) &&
-        check_helper(rule_6, note, cantus_firmus, solution) &&
-        check_helper(rule_7, note, cantus_firmus, solution) &&
-        check_helper(rule_8, note, cantus_firmus, solution) &&
-        check_helper(rule_9, note, cantus_firmus, solution) &&
-        check_helper(rule_10, note, cantus_firmus, solution) &&
-        check_helper(rule_11, note, cantus_firmus, solution) &&
-        check_helper(rule_12, note, cantus_firmus, solution) &&
-        check_helper(rule_13, note, cantus_firmus, solution) &&
-        check_helper(rule_14, note, cantus_firmus, solution))
+var rule_15 = new Rule(function(note, cantus_firmus, solution) {
+    pos = solution.notes.length
+    if (solution.notes[pos - 2] == undefined && solution.notes[pos - 1] != undefined) {
+        if (solution.notes[pos - 1].note_number >= note.note_number)
+            return false
+    }
+    if (solution.notes[pos - 3] == undefined && solution.notes[pos - 2] != undefined && solution.notes[pos - 1] != undefined) {
+        if (solution.notes[pos - 2].note_number <= note.note_number)
+            return false
+    }
     return true
+
+    var seven = 11
+    if (Exercise.mode == 2 || Exercise.mode == 3 || Exercise.mode == 5 || Exercise.mode == 7)
+        seven = 10
+
+}, 'climax must be highest note', 15)
+
+var rule_16 = new Rule(function(note, cantus_firmus, solution) {
+    pos = solution.notes.length
+    if (solution.notes[pos - 2] == undefined && solution.notes[pos - 1] != undefined) {
+        if (note.norm_note == 11) {
+            return false
+        }
+    }
+    return true
+
+}, 'climax cannot be a leading tone', 16)
+
+function run_checks(note, cantus_firmus, solution) {
+    if (Exercise.climax && (!check_helper(rule_15, note, cantus_firmus, solution)
+            || !check_helper(rule_16, note, cantus_firmus, solution)))
+        return false
+    
+    if (check_helper(rule_1, note, cantus_firmus, solution) &&
+            check_helper(rule_2, note, cantus_firmus, solution) &&
+            check_helper(rule_3, note, cantus_firmus, solution) &&
+            check_helper(rule_4, note, cantus_firmus, solution) &&
+            check_helper(rule_5, note, cantus_firmus, solution) &&
+            check_helper(rule_6, note, cantus_firmus, solution) &&
+            check_helper(rule_7, note, cantus_firmus, solution) &&
+            check_helper(rule_8, note, cantus_firmus, solution) &&
+            check_helper(rule_9, note, cantus_firmus, solution) &&
+            check_helper(rule_10, note, cantus_firmus, solution) &&
+            check_helper(rule_11, note, cantus_firmus, solution) &&
+            check_helper(rule_12, note, cantus_firmus, solution) &&
+            check_helper(rule_13, note, cantus_firmus, solution) &&
+            check_helper(rule_14, note, cantus_firmus, solution))
+        return true
+    
+    return false
 }
 
 function check_helper(rule, note, cantus_firmus, solution) {

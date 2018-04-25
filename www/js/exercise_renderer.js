@@ -38,7 +38,7 @@ function render_exercise() {
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 
     if (nextHorizontalSection > Exercise.cantus_firmus.length || 
-            (get_fut_notenums().length == Exercise.cantus_firmus.length && wrongNote==-1) 
+            (is_complete() && wrongNote==-1) 
             && submitted) {
         var alert = document.getElementById('success')
         alert.style.visibility = 'visible'
@@ -157,6 +157,8 @@ function drawNotes(noteArray, numArray, solutionLine) {
     var c = canvas.getContext("2d");
     var noteSpace = lineSpacing / 2;
     for (var i = 0; i < noteArray.length; i++) {
+        if (noteArray[i] == undefined)
+            continue
         c.beginPath();
         var xPos = noteArray[i].x;
         var yPos = noteArray[i].y;
@@ -297,15 +299,45 @@ function staff_click(event) {
         solutionPos.push(curHorizontalSection-1)
         accidentals[curHorizontalSection-1] = writing_acc
         render_exercise()
-        if (get_fut_notenums().length == Exercise.cantus_firmus.length) {
+        if (is_complete()) {
             showSubmitButton()
             // check_answer()
         }
     }
-
-
     
     startClick = true;
+}
+
+function is_complete() {
+    var complete = true
+    if (Exercise.entire) {
+        complete = (get_fut_notenums().length == Exercise.cantus_firmus.length)
+    } else if (Exercise.beginning) {
+        for (var i = 0; i < 3; i++) {
+            if (!(i in fut_notenums))
+                complete = false
+        }
+        if (get_fut_notenums().length != 3) complete = false
+    } else if (Exercise.climax) {
+        var sorted = []
+        for (var key in fut_notenums) {
+            sorted.push(parseInt(key))
+        }
+        sorted.sort(function(a, b){return a - b})
+        for (var i = 1; i < sorted.length; i++) {
+            if (sorted[i] != sorted[i-1] + 1)
+                complete = false
+        }
+        if (get_fut_notenums().length != 3) complete = false
+    } else if (Exercise.end) {
+        var l = Exercise.cantus_firmus.length
+        for (var i = l - 1; i > l - 4; i--) {
+            if (!(i in fut_notenums))
+                complete = false
+        }
+        if (get_fut_notenums().length != 3) complete = false
+    }
+    return complete
 }
     
 function staff_hover(event) {
@@ -389,7 +421,7 @@ function getMousePos(canvas, evt) {
 }
 
 function get_fut_notenums() {
-    sorted = []
+    var sorted = []
     for (var key in fut_notenums) {
         sorted.push(parseInt(key))
     }
@@ -403,7 +435,7 @@ function get_fut_notenums() {
 }
 
 function get_fut_notepoints() {
-    sorted = []
+    var sorted = []
     for (var key in fut_notenums) {
         sorted.push(parseInt(key))
     }
@@ -519,6 +551,10 @@ function convertNumFromTop() {
     var converted = [];
     for (var i = 0; i < solutionNums.length; i++) {
         var num = solutionNums[i];
+        if (num == undefined) {
+            converted.push(num)
+            continue
+        }
         var midi_num;
         switch (num) {
             case -5: midi_num = 87; break;
@@ -558,6 +594,10 @@ function convertNumFromTopBass() {
     var converted = [];
     for (var i = 0; i < solutionNums.length; i++) {
         var num = solutionNums[i];
+        if (num == undefined) {
+            converted.push(num)
+            continue
+        }
         var midi_num;
         switch (num) {
             case -5: midi_num = 67; break;
@@ -603,13 +643,18 @@ function check_note(note) {
         solution  = convertNumFromTopBass()
     }
 
+    if (solution_obj.notes.length == 0 && solution.length > 0) {
+        for (var i = 0; i < solution.length - 1; i++) {
+            solution_obj.notes.push(undefined)
+        }
+    }
      
     var idx = solution.length - 1
     var note = solution[idx]
     var first = solution.length === 1
     var next = new RelativeNote(note - Exercise.key_center , first)
     next.harmonic_interval = next.note_number - Exercise.cantus_firmus[idx].note_number
-    if (!first) {
+    if (!first && solution_obj.notes[idx - 1] != undefined) {
         var prev = solution_obj.notes[idx - 1]
         next.melodic_interval = next.note_number - prev.note_number
     }
@@ -625,7 +670,7 @@ function check_note(note) {
         sol_copy = new Solution()
         sol_copy.copy_prev(solution_obj)
         // search(all_solutions, Exercise.cantus_firmus.length - solution.length, Exercise.cantus_firmus, sol_copy)
-        console.log(all_solutions.length)
+        //console.log(all_solutions.length)
         return true
     } else {
         solutionNums.pop()
@@ -716,6 +761,13 @@ function showSubmitButton() {
     submitButton.style.visibility = 'visible'
 }
 
+function submit() {
+    if (Exercise.entire)
+        check_answer()
+    else 
+        check_three_notes()
+}
+
 function check_answer() {
     submitted = true;
     document.getElementById('submit').style.visibility = 'hidden'
@@ -745,13 +797,67 @@ function check_answer() {
     return true
 }
 
+function check_three_notes() {
+    submitted = true
+    document.getElementById('submit').style.visibility = 'hidden'
+    if (!is_complete()) {
+        return false
+    }
+    solutionPoints = []
+    solutionNums = []
+    solution_obj = new Solution()
+    var solPoints = get_fut_notepoints_three()
+    var solNums = get_fut_notenums_three()
+    for (var i = 0; i < Exercise.cantus_firmus.length; i++) {
+        solutionPoints.push(solPoints[i])
+        solutionNums.push(solNums[i])
+        
+        if (solutionPos.includes(i)) {
+            if (!check_note()) {
+                wrongNote = i;
+                solutionPoints = []
+                solutionNums = []
+                solution_obj = new Solution()
+                render_exercise()
+                return false
+            }
+        }
+    }
+    solutionPoints = []
+    solutionNums = []
+    solution_obj = new Solution()
+    wrongNote = -1
+    render_exercise()
+    return true
+}
+
+function get_fut_notenums_three() {
+    result = []
+    for (var i =0; i < Exercise.cantus_firmus.length; i++) {
+        result.push(fut_notenums[i])
+    }
+    return result
+}
+
+function get_fut_notepoints_three() {
+    result = []
+    for (var i =0; i < Exercise.cantus_firmus.length; i++) {
+        result.push(fut_notepoints[i])
+    }
+    return result
+}
+
+
 function drawWrongCircle() {
-    if (wrongNote > -1 && get_fut_notenums().length == Exercise.cantus_firmus.length) {
+    if (wrongNote > -1 && is_complete()) {
         var canvas = document.getElementById('myCanvas');  
         var c = canvas.getContext("2d");
         c.beginPath()
         var noteSpace = lineSpacing / 2;
-        var point = get_fut_notepoints()[wrongNote]
+        if (Exercise.entire)
+            var point = get_fut_notepoints()[wrongNote]
+        else
+            var point = get_fut_notepoints_three()[wrongNote]
         var radius = noteSpace * 5/3
         c.strokeStyle = "red"
         c.lineWidth = 3
