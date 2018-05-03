@@ -16,6 +16,8 @@ var Exercise = new function() {
     this.end = false
     this.entire = true
 
+    this.example = null
+
     this.setUpper = function () {
         this.lower_cp = false
         this.upper_cp = true
@@ -106,12 +108,42 @@ var Exercise = new function() {
         }
     }
 
+    this.get_key_center_name = function() {
+        var center_norm = this.key_center
+        center_norm = center_norm % 12
+        switch (center_norm) {
+            case 0: return "C"; break;
+            case 1: return "D flat/C sharp"; break;
+            case 2: return "D"; break;
+            case 3: return "E flat/D sharp"; break;
+            case 4: return "E"; break;
+            case 5: return "F"; break;
+            case 6: return "G flat/F sharp"; break;
+            case 7: return "G"; break;
+            case 8: return "A flat/G sharp"; break;
+            case 9: return "A"; break;
+            case 10: return "B flat/A sharp"; break;
+            case 11: return "B"; break;
+        }
+    }
+
+}
+
+class State {
+    constructor(ex, pts, nums, pos, acc) {
+        this.exercise_clone = ex;
+        this.fut_pts = pts;
+        this.fut_nums = nums;
+        this.sol_pos = pos;
+        this.accidentals = acc;
+    }
 }
 
 class Example {
-    constructor(cf, mode) {
+    constructor(cf, mode, credit) {
         this.cf = cf
         this.mode = mode
+        this.credit = credit
     }
 
     transpose(steps) {
@@ -119,7 +151,7 @@ class Example {
         for (var i = 0; i < this.cf.length; i++) {
             new_cf.push(this.cf[i] + steps)
         }
-        return new Example(new_cf, this.mode)
+        return new Example(new_cf, this.mode, this.credit)
     }
 }
 

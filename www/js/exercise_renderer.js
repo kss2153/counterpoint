@@ -33,6 +33,7 @@ var writing_acc = 0
 
 var submitted = false
 
+
 function render_exercise() {
     var canvas = document.getElementById('myCanvas');   
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
@@ -47,8 +48,8 @@ function render_exercise() {
         alert.style.visibility = 'hidden'
     }
 
-    var roomForClef = canvas.width * .03;
-    leftMargin = canvas.width * .1 + roomForClef;
+    // roomForClef = canvas.width * .03;
+    leftMargin = canvas.width * .05 + roomForClef;
     topMargin = canvas.height * .6;
     lineSpacing = canvas.height * .02;
     
@@ -82,34 +83,37 @@ function render_exercise() {
     } else {
         topMargin = canvas.height * .6;
     }
+
+    document.getElementById('mode').innerHTML = Exercise.get_mode_name()
+    document.getElementById('credit').innerHTML = '*' + Exercise.example.credit
     
 }
 
 function drawStaffLines(canvas) {
     var ctx = canvas.getContext("2d")
-    var roomForClef = canvas.width * .03;
+    // var roomForClef = canvas.width * .03;
 
     ctx.beginPath();
     var currentPos = topMargin;
 
     ctx.moveTo(leftMargin - roomForClef, currentPos);
-    ctx.lineTo(canvas.width - leftMargin, currentPos);
+    ctx.lineTo(canvas.width - leftMargin + 2*roomForClef, currentPos);
 
     currentPos = currentPos + lineSpacing;;
     ctx.moveTo(leftMargin - roomForClef, currentPos);
-    ctx.lineTo(canvas.width - leftMargin, currentPos);
+    ctx.lineTo(canvas.width - leftMargin + 2*roomForClef, currentPos);
 
     currentPos = currentPos + lineSpacing;;
-    ctx.moveTo(leftMargin - roomForClef, currentPos);
-    ctx.lineTo(canvas.width - leftMargin, currentPos);
+    ctx.moveTo(leftMargin - roomForClef , currentPos);
+    ctx.lineTo(canvas.width - leftMargin + 2*roomForClef, currentPos);
     
     currentPos = currentPos + lineSpacing;;
     ctx.moveTo(leftMargin - roomForClef, currentPos);
-    ctx.lineTo(canvas.width - leftMargin, currentPos);
+    ctx.lineTo(canvas.width - leftMargin + 2*roomForClef, currentPos);
 
     currentPos = currentPos + lineSpacing;;
     ctx.moveTo(leftMargin - roomForClef, currentPos);
-    ctx.lineTo(canvas.width - leftMargin, currentPos);
+    ctx.lineTo(canvas.width - leftMargin + 2*roomForClef, currentPos);
     
     ctx.stroke();
     ctx.closePath();
@@ -117,15 +121,15 @@ function drawStaffLines(canvas) {
 
 function drawClef(canvas, clef_image) {
     var c = canvas.getContext("2d");
-    var roomForClef = canvas.width * .03;
+    // var roomForClef = canvas.width * .03;
     c.drawImage(clef_image, leftMargin - roomForClef, 
-        topMargin - lineSpacing, roomForClef, lineSpacing * 6.5); 
+        topMargin - lineSpacing, roomForClef*2/3, lineSpacing * 6.5); 
 }
 
 function drawBrace(canvas, brace_image) {
     var c = canvas.getContext("2d");
     var braceWidth = canvas.width * .015;
-    var roomForClef = canvas.width * .03;
+    // var roomForClef = canvas.width * .03;
 
     c.drawImage(brace_image, leftMargin - roomForClef - braceWidth * 2, 
         canvas.height * 0.3 - lineSpacing/2, braceWidth, canvas.height * 0.3 + lineSpacing*5); 
@@ -134,8 +138,8 @@ function drawBrace(canvas, brace_image) {
 function drawBarLines() {
     var canvas = document.getElementById('myCanvas'); 
     var c = canvas.getContext("2d");
-    var roomForClef = canvas.width * .03;
-    var lineLength = canvas.width - 2 * leftMargin - roomForClef; 
+    // var roomForClef = canvas.width * .03;
+    var lineLength = canvas.width - 2 * leftMargin + roomForClef; 
     var sectionLength = lineLength / horizontalSections;
 
     c.beginPath()
@@ -303,6 +307,7 @@ function staff_click(event) {
             showSubmitButton()
             // check_answer()
         }
+        pushState()
     }
     
     startClick = true;
@@ -352,7 +357,7 @@ function staff_hover(event) {
     var y = mousePos.y;
 
     // check horizontal location of mouse
-    var lineLength = canvas.width - 2 * leftMargin; 
+    var lineLength = canvas.width - 2 * leftMargin + roomForClef; 
     var sectionLength = lineLength / horizontalSections;
     curHorizontalSection = Math.ceil((x- leftMargin) / sectionLength);
     if (curHorizontalSection > Exercise.cantus_firmus.length)
@@ -384,10 +389,10 @@ function drawHoverNote(canvas, y) {
     var noteNumberFromTop = Math.floor(dist / noteSpace); 
     currentNoteNum = noteNumberFromTop;    
 
-    var lineLength = canvas.width - 2 * leftMargin - 0.03*canvas.width; 
+    var lineLength = canvas.width - 2 * leftMargin + roomForClef; 
     var sectionLength = lineLength / horizontalSections;    
     // var centerX = leftMargin + 0.03*canvas.width + (nextHorizontalSection * sectionLength) - (sectionLength * 8 / 10);
-    var centerX = leftMargin + 0.03*canvas.width + (curHorizontalSection * sectionLength) - (sectionLength * 8 / 10);
+    var centerX = leftMargin + roomForClef + (curHorizontalSection * sectionLength) - (sectionLength * 8 / 10);
     var centerY = noteNumberFromTop * noteSpace + (topMargin - noteSpace); 
 
     currentNotePoint = {x: centerX, y: centerY};
@@ -452,9 +457,10 @@ function getNotePoint(noteNumberFromTop, index) {
     var noteSpace = lineSpacing / 2;
     var canvas = document.getElementById('myCanvas');
 
-    var lineLength = canvas.width - 2 * leftMargin - 0.03*canvas.width; 
+    // var roomForClef = canvas.width * 0.03
+    var lineLength = canvas.width - 2 * leftMargin + roomForClef; 
     var sectionLength = lineLength / horizontalSections;    
-    var centerX = leftMargin +0.03*canvas.width + ((index + 1) * sectionLength) - (sectionLength * 8 / 10);
+    var centerX = leftMargin +roomForClef + ((index + 1) * sectionLength) - (sectionLength * 8 / 10);
     var centerY = noteNumberFromTop * noteSpace + (topMargin - noteSpace); 
     return {x: centerX, y: centerY};
 }
@@ -695,37 +701,29 @@ var state_stack_points = []
 var state_stack_notes = []
 
 function undo() {
-    if (nextHorizontalSection == 1)
-        return
-    var last = solution_obj.notes.pop()
-    state_stack_notes.push(last)
-    if (last.harmonic_interval in solution_obj.perfects) {
-        solution_obj.perfects[last.harmonic_interval]--
-    } 
-    if (solution_obj.notes.length > 0) {
-        if (last.note_number == solution_obj.notes[solution_obj.notes.length - 1].note_number) {
-            solution_obj.obliques--
-        }
+    if (states.length > 1) {
+        states_redo.push(states.pop())
+        loadState(states[states.length-1])
     }
-    state_stack_nums.push(solutionNums.pop())
-    state_stack_points.push(solutionPoints.pop())
-    nextHorizontalSection--
-    persist()
-    render_exercise()
 }
 
 function redo() {
-    if (state_stack_notes.length > 0) {
-        nextHorizontalSection++
-        solutionNums.push(state_stack_nums.pop())
-        solutionPoints.push(state_stack_points.pop())
-        solution_obj.notes.push(state_stack_notes.pop())
-        persist()
-        render_exercise()
-    }
+    
+    if (states_redo.length > 0) {
+        var s = states_redo.pop()
+        states.push(s)
+        loadState(s)
+    }  
 }
 
 function reset() {
+
+    if (get_fut_notenums().length > 0) {
+        saveSolution()
+        $('#save_modal').modal('show');
+    }
+   
+    
     var state_stack_nums = []
     var state_stack_points = []
     var state_stack_notes = []
@@ -740,16 +738,21 @@ function reset() {
     render_exercise()
     document.getElementById('submit').style.visibility = 'hidden'
     document.getElementById('alert').style.visibility = 'hidden'
+
+    states = []
+    states_redo = []
+    pushState()
+    
 }
 
 function toggle_top(link) {
     if (link.innerHTML == 'upper') {
-        Exercise.setLower()
         reset()
+        Exercise.setLower()
         link.innerHTML = 'lower'
     } else {
-        Exercise.setUpper()
         reset()
+        Exercise.setUpper()
         link.innerHTML = 'upper'
     }
     var alert = document.getElementById('alert')
@@ -766,6 +769,7 @@ function submit() {
         check_answer()
     else 
         check_three_notes()
+    render_exercise()
 }
 
 function check_answer() {
@@ -793,7 +797,11 @@ function check_answer() {
             return false
         }
     }
+    solutionPoints = []
+    solutionNums = []
+    solution_obj = new Solution()
     wrongNote = -1
+    render_exercise()
     return true
 }
 
@@ -931,25 +939,28 @@ function reverseHelper(midi_num) {
     return midi_num
 }
 
-function renderAccidental(clef, notenum, pos, image) {
+function renderAccidental(clef, notenum, pos, image, symbol) {
     var canvas = document.getElementById('myCanvas');
     var c = canvas.getContext("2d")
     var noteSpace = lineSpacing / 2
-    var acc_height = lineSpacing * 3/2
-    var acc_width = acc_height * 1/2
+    var acc_height = lineSpacing * 3
+    var acc_width = roomForClef/6
     if (clef == 'bass') notenum += 2
     if (clef == 'alto') notenum += 1
     var centerY = notenum * noteSpace + (topMargin - noteSpace)
-    c.drawImage(image, leftMargin + pos*acc_width/2, 
+    c.drawImage(image, leftMargin - roomForClef/3 + pos*acc_width, 
         centerY - acc_height/2, acc_width, acc_height)
+
+    // c.fillStyle = "black"
+    // c.fillText(symbol,leftMargin - noteSpace*2.5,centerY+noteSpace/2)
 }
 
 function rendersharp(clef, notenum, pos) {
-    renderAccidental(clef, notenum, pos, sharp_image)
+    renderAccidental(clef, notenum, pos, sharp_image, '♯')
 }
 
 function renderFlat(clef, notenum, pos) {
-    renderAccidental(clef, notenum, pos, flat_image)
+    renderAccidental(clef, notenum, pos, flat_image, '♭')
 }
 
 function drawSharps(clef) {
@@ -987,4 +998,63 @@ function drawSharps(clef) {
     if (key_sig <= -6) {
         renderFlat(clef, 4, 6)
     }
+}
+
+
+
+var states = []
+var states_redo = []
+var saved = []
+function pushState() {
+
+    var state = new State(Object.assign({}, Exercise),
+                            Object.assign({}, fut_notepoints),
+                            Object.assign({}, fut_notenums),
+                            Object.assign({}, solutionPos),
+                            Object.assign({}, accidentals))
+
+    states.push(state)
+}
+
+function loadState(state) {
+    Exercise = state.exercise_clone
+    fut_notepoints = state.fut_pts
+    fut_notenums = state.fut_nums
+    solutionPos = state.sol_pos
+    accidentals = state.accidentals
+
+    var t = document.getElementById('toggle')
+    if (Exercise.upper_cp)
+        t.innerHTML = "upper"
+    else
+        t.innerHTML = "lower"
+    render_exercise()
+}
+
+function saveSolution() {
+
+    var s = states[states.length - 1]
+    var name = Exercise.get_key_center_name() + " " + Exercise.get_mode_name()
+    if (Exercise.upper_cp) {
+        name += " upper"
+    } else {
+        name += " lower"
+    }
+    saved.push({name, s})
+
+}
+
+function openLoadModal() {
+    if (saved.length == 0) 
+        return
+    var container = document.getElementById('state_select')
+    for (var i = 0; i < saved.length; i++) {
+        container.innerHTML += "<option>" + saved[i].name + "</option>"
+    }
+    $('#load_modal').modal('show');
+}
+
+function loadSavedSolution() {
+    var selected = document.getElementById('state_select').selectedIndex
+    loadState(saved[selected].s)
 }

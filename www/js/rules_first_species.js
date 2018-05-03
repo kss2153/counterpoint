@@ -323,7 +323,7 @@ var rule_13 = new Rule(function(note, cantus_firmus, solution) {
     return false 
   
     
-}, 'This interval is a dissonance', 13)
+}, 'This interval is a dissonance or out of range', 13)
 
 var rule_14 = new Rule(function(note, cantus_firmus, solution) {
     pos = solution.notes.length
@@ -344,14 +344,10 @@ var rule_15 = new Rule(function(note, cantus_firmus, solution) {
             return false
     }
     if (solution.notes[pos - 3] == undefined && solution.notes[pos - 2] != undefined && solution.notes[pos - 1] != undefined) {
-        if (solution.notes[pos - 2].note_number <= note.note_number)
+        if (solution.notes[pos - 1].note_number <= note.note_number)
             return false
     }
     return true
-
-    var seven = 11
-    if (Exercise.mode == 2 || Exercise.mode == 3 || Exercise.mode == 5 || Exercise.mode == 7)
-        seven = 10
 
 }, 'climax must be highest note', 15)
 

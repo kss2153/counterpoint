@@ -1,12 +1,14 @@
 var state = null
+var roomForClef = 0
 
 window.onload = window.onresize = function() {
+
     document.body.addEventListener('keydown', function (e) {
         if (e.keyCode == 8)
             undo()
     })
  
-    exercise_setup()
+    document.getElementById('0').style.color = "black"
     
     var canvas = document.getElementById('myCanvas') 
     var ctx = canvas.getContext("2d") 
@@ -15,9 +17,11 @@ window.onload = window.onresize = function() {
 
     canvas.width = window.innerWidth * .95
     canvas.height = window.innerHeight * .95
+    roomForClef = canvas.width * 0.04;
+    exercise_setup()
     
     // draw staff
-    var roomForClef = canvas.width * .03
+    // var roomForClef = canvas.width * .03
 
     sharp_image = new Image()
     treble_clef_image = new Image()
@@ -36,6 +40,9 @@ window.onload = window.onresize = function() {
         nextHorizontalSection = load['next']
         render_exercise()
     }
+
+    
+
 }
 
 function loadImages() {
@@ -75,12 +82,6 @@ function getSolutionPoints() {
 
 cur_example = 0
 function exercise_setup() {
-    document.getElementById('0').style.color = "black"
-    var cf = [ 1, 5 , 6, 8,  5, 10, 8, 5, 6, 5, 3, 1 ]
-    cf = [60, 62, 64, 65, 67, 64, 65, 62, 60]
-    
-    // cf = [65, 67, 69, 70, 72, 69, 70, 67, 65]
-    //cf = [ 1, 3, 5, 6, 3, 1]
     var t = document.getElementById('toggle')
     if (t.innerHTML == "upper")
         Exercise.setUpper()
@@ -88,36 +89,36 @@ function exercise_setup() {
         Exercise.setLower()
 
     ex = examples[cur_example]
-    // var ex = new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 2)
-    // ex = new Example([64, 60, 62, 60, 57, 69, 67, 64, 65, 64], 3)
-    // ex = new Example([55, 62, 60, 57, 59, 60, 59, 57, 55], 5)
+
     Exercise.inputCF(ex.cf)
     Exercise.setMode(ex.mode)
-    document.getElementById('mode').innerHTML = Exercise.get_mode_name()
+    Exercise.example = ex
+    states = []
+    pushState()
 }
 
 CANTUS_FIRMI = [
 
-    new Example([60, 62, 65, 64, 65, 67, 69, 67, 64, 62, 60], 1), // SCHENKER 1
-    new Example([60, 62, 64, 65, 67, 62, 65, 64, 62, 60], 1), // SCHENKER 1
-    new Example([62, 67, 66, 71, 69, 66, 67, 66, 64, 62], 1), // S&S 1
-    new Example([58, 62, 60, 67, 65, 62, 63, 62, 60, 58], 1), // S&S 1
-    new Example([65, 67, 69, 65, 62, 64, 65, 72, 69, 65, 67, 65], 1), // FUX 1
-    new Example([57, 59, 61, 66, 64, 57, 59, 62, 61, 59, 57], 1), // S&S 1
+    new Example([60, 62, 65, 64, 65, 67, 69, 67, 64, 62, 60], 1, 'Schenker'), // SCHENKER 1
+    new Example([60, 62, 64, 65, 67, 62, 65, 64, 62, 60], 1, 'Schenker'), // SCHENKER 1
+    new Example([62, 67, 66, 71, 69, 66, 67, 66, 64, 62], 1, 'Salzer and Schachter'), // S&S 1
+    new Example([58, 62, 60, 67, 65, 62, 63, 62, 60, 58], 1, 'Salzer and Schachter'), // S&S 1
+    new Example([65, 67, 69, 65, 62, 64, 65, 72, 69, 65, 67, 65], 1, 'Fux'), // FUX 1
+    new Example([57, 59, 61, 66, 64, 57, 59, 62, 61, 59, 57], 1, 'Salzer and Schachter'), // S&S 1
 
-    new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 2), // S&S
+    new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 2, 'Salzer and Schachter'), // S&S
 
-    new Example([64, 60, 62, 60, 57, 69, 67, 64, 65, 64], 3), // S&S
+    new Example([64, 60, 62, 60, 57, 69, 67, 64, 65, 64], 3, 'Salzer and Schachter'), // S&S
 
 
-    new Example([55, 62, 60, 57, 59, 60, 59, 57, 55], 5), // S&S
+    new Example([55, 62, 60, 57, 59, 60, 59, 57, 55], 5, 'Salzer and Schachter'), // S&S
 
-    new Example([62, 65, 64, 62, 67, 65, 69, 67, 65, 64, 62], 6), // FUX 6
-    new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 6), // JEPPESEN 6
-    new Example([55, 62, 60, 63, 62, 58, 60, 58, 57, 55], 6), // S&S 6
-    new Example([57, 60, 59, 60, 62, 64, 60, 59, 57], 6), // S&S 6
-    new Example([59, 54, 57, 55, 54, 62, 61, 59], 6), // S&S 6
-    new Example([60, 62, 65, 63, 68, 67, 65, 62, 63, 62, 60], 6), // S&S 6
+    new Example([62, 65, 64, 62, 67, 65, 69, 67, 65, 64, 62], 6, 'Fux'), // FUX 6
+    new Example([62, 69, 67, 65, 64, 62, 65, 64, 62], 6, 'Jeppesen'), // JEPPESEN 6
+    new Example([55, 62, 60, 63, 62, 58, 60, 58, 57, 55], 6, 'Salzer and Schachter'), // S&S 6
+    new Example([57, 60, 59, 60, 62, 64, 60, 59, 57], 6, 'Salzer and Schachter'), // S&S 6
+    new Example([59, 54, 57, 55, 54, 62, 61, 59], 6, 'Salzer and Schachter'), // S&S 6
+    new Example([60, 62, 65, 63, 68, 67, 65, 62, 63, 62, 60], 6, 'Salzer and Schachter'), // S&S 6
 
 
 ]
@@ -138,6 +139,8 @@ function nextCF(num) {
         cur_example -= 1
     if (num == 2 && cur_example < examples.length-1)
         cur_example += 1
+
+    ex = examples[cur_example]
     
     reset()
     exercise_setup()
@@ -168,9 +171,12 @@ function switchAccButton(num) {
     nums = [1, -1, 2]
     for (var i = 0; i < nums.length; i++) {
         document.getElementById('acc_'+nums[i]).classList.remove('active')
+        button.style.color = "white"
     }
-    if (!active) 
+    if (!active) {
         button.classList.add('active')
+        button.style.color = "black"
+    }
 }
 
 function shuffle(arra1) {

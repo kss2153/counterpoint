@@ -68,6 +68,9 @@
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
+                    <a class="nav-link" onclick="openLoadModal()" href="#">load</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" onclick="undo()" href="#">undo</a>
                 </li>
                 <li class="nav-item">
@@ -106,7 +109,7 @@
         <button id="acc_2" class="btn btn-secondary" onclick="if (writing_acc != 2) {writing_acc=2} else {writing_acc = 0};switchAccButton(2)">&#9838</button>
     </div>
 
-    <div style="position:fixed;width:30%;left:50%;top:80%;margin-left:-15%">
+    <div style="position:fixed;width:40%;left:50%;top:80%;margin-left:-20%">
         <div id="instruction" style="font-size:20px;text-align: center">complete the entire exercise</div>
         <div style="font-size:20px;display: flex;justify-content: center;">
             <button id="1" class="btn btn-secondary" onclick="setExerciseRange(1)">beginning</button>
@@ -127,10 +130,66 @@
     </div>
 
     <div id="mode" style="font-size:40px;position:fixed;top:80%;left:10%"></div>
+    <div id="credit" style="font-size:20px;position:fixed;top:90%;left:10%"></div>
 
     <div style="position: fixed; bottom: 0px; width: 100%;text-align: center">
         <div>by Kayvon Seif-Naraghi</div>
     </div>
+
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Do you want to keep your progress?</h5>
+            </div>
+            <div class="modal-body">
+              this will preserve your notes for when you attempt the entire exercise
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">no</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal">yes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="save_modal" tabindex="-1" role="dialog" aria-labelledby="save_modal_title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Do you want to keep your progress?</h5>
+            </div>
+            <div class="modal-body">
+              You will be able to return to your work by accessing the load dropdown menu
+            </div>
+            <div class="modal-footer">
+              <button onclick="saved.pop();" type="button" class="btn btn-secondary" data-dismiss="modal">no</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal">yes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="load_modal" tabindex="-1" role="dialog" aria-labelledby="load_modal_title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Which solution would you like to load?</h5>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="state_select">Select from below:</label>
+                    <select class="form-control" id="state_select">
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">cancel</button>
+              <button onclick="loadSavedSolution()" type="button" class="btn btn-primary" data-dismiss="modal">load</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
   
 
