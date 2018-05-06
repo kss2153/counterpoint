@@ -388,12 +388,10 @@ function run_checks(note, cantus_firmus, solution) {
 
 function check_helper(rule, note, cantus_firmus, solution) {
     if (!rule.check(note, cantus_firmus, solution)) {
-        if (verbose) {
-            var alert = document.getElementById('alert')
-            alert.innerHTML = rule.msg
-            alert.style.visibility = 'visible'
-            console.log(rule.msg + " error: " + rule.code)
-        }
+        var alert = document.getElementById('alert')
+        alert.innerHTML = rule.msg
+        alert.style.visibility = 'visible'
+        // console.log(rule.msg + " error: " + rule.code)
         return false
     }
     return true

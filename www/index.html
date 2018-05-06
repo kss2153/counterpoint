@@ -31,12 +31,15 @@
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="#">Learn Counterpoint</a>
+        <a class="navbar-brand" href="/">Learn Counterpoint</a>
         
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             
 
             <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" onclick="$('#contents_modal').modal('show');" href="#">contents</a>
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         rules
@@ -103,7 +106,7 @@
         <a onclick="reset()" role="button" class="btn btn-secondary" style="color:white">reset</a>
     </div>  -->
 
-    <div style="font-size:40px;position:fixed;top:10%;left:90%">
+    <div style="font-size:40px;position:fixed;top:10%;right:5%">
         <button id="acc_1" class="btn btn-secondary" onclick="if (writing_acc != 1) {writing_acc=1} else {writing_acc = 0};switchAccButton(1)">&#9839</button>
         <button id="acc_-1" class="btn btn-secondary" onclick="if (writing_acc != -1) {writing_acc=-1} else {writing_acc = 0};switchAccButton(-1)">&#9837</button>
         <button id="acc_2" class="btn btn-secondary" onclick="if (writing_acc != 2) {writing_acc=2} else {writing_acc = 0};switchAccButton(2)">&#9838</button>
@@ -120,13 +123,13 @@
     </div>
     
 
-    <div style="font-size:40px;position:fixed;top:80%;left:90%">
+    <div style="font-size:40px;position:fixed;top:80%;right:5%">
         <button class="btn btn-secondary btn-lg" onclick="nextCF(1)"><</button>
         <button class="btn btn-secondary btn-lg" onclick="nextCF(2)">></button>
     </div>
 
-    <div style="position:fixed;top:45%;left:90%">
-        <button class="btn btn-success" style="visibility:hidden" id="submit" onclick="submit()">check</button>
+    <div style="position:fixed;top:81%;left:70%">
+        <button class="btn btn-success btn-lg" style="visibility:hidden" id="submit" onclick="submit()">check</button>
     </div>
 
     <div id="mode" style="font-size:40px;position:fixed;top:80%;left:10%"></div>
@@ -169,6 +172,40 @@
           </div>
         </div>
       </div>
+      
+      <div class="modal fade" id="contents_modal" tabindex="-1" role="dialog" aria-labelledby="contents_title" aria-hidden="true">
+            <div style="overflow-y: initial !important" class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle">Cantus Firmi</h5>
+                </div>
+                <div class="modal-body" style="height: 250px;overflow-y: auto;">
+                        <div class="list-group">
+                            <a href="#" data-alias="0" class="list-group-item list-group-item-action">C major - Schenker (1)</a>
+                            <a href="#" data-alias="1" class="list-group-item list-group-item-action">C major - Schenker (2)</a>
+                            <a href="#" data-alias="2" class="list-group-item list-group-item-action">D major - Salzer and Schachter</a>
+                            <a href="#" data-alias="3" class="list-group-item list-group-item-action">B♭ major - Salzer and Schachter</a>
+                            <a href="#" data-alias="4" class="list-group-item list-group-item-action">F major - Fux</a>
+                            <a href="#" data-alias="5" class="list-group-item list-group-item-action">A major - Salzer and Schachter</a>
+                            <a href="#" data-alias="6" class="list-group-item list-group-item-action">D dorian - Salzer and Schachter</a>
+                            <a href="#" data-alias="7" class="list-group-item list-group-item-action">E phrygian - Salzer and Schachter</a>
+                            <a href="#" data-alias="8" class="list-group-item list-group-item-action">G mixolydian - Salzer and Schachter</a>
+                            <a href="#" data-alias="9" class="list-group-item list-group-item-action">D minor - Fux</a>
+                            <a href="#" data-alias="10" class="list-group-item list-group-item-action">D minor - Jeppesen</a>
+                            <a href="#" data-alias="11" class="list-group-item list-group-item-action">G minor - Salzer and Schachter</a>
+                            <a href="#" data-alias="12" class="list-group-item list-group-item-action">A minor - Salzer and Schachter</a>
+                            <a href="#" data-alias="13" class="list-group-item list-group-item-action">B minor - Salzer and Schachter</a>
+                            <a href="#" data-alias="14" class="list-group-item list-group-item-action">C minor - Salzer and Schachter</a>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">cancel</button>
+                  <button onclick="contentsButton()" type="button" class="btn btn-primary" data-dismiss="modal">load</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      
 
       <div class="modal fade" id="load_modal" tabindex="-1" role="dialog" aria-labelledby="load_modal_title" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">

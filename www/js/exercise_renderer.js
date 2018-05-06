@@ -86,6 +86,19 @@ function render_exercise() {
 
     document.getElementById('mode').innerHTML = Exercise.get_mode_name()
     document.getElementById('credit').innerHTML = '*' + Exercise.example.credit
+    if (!is_complete())
+        document.getElementById('submit').style.visibility = 'hidden'
+    else
+        document.getElementById('submit').style.visibility = 'visible'
+
+    if (Exercise.beginning)
+        setExerciseRangeHelper(1)
+    else if (Exercise.climax)
+        setExerciseRangeHelper(2)
+    else if (Exercise.end) 
+        setExerciseRangeHelper(3)
+    else if (Exercise.entire)
+        setExerciseRangeHelper(0)
     
 }
 
@@ -587,9 +600,10 @@ function convertNumFromTop() {
             case 16: midi_num = 52; break;
             case 17: midi_num = 50; break;
         }
+        midi_num = topToNumHelper(midi_num)
         if (accidentals[i] != 2) {
             midi_num += accidentals[i]
-            converted.push(topToNumHelper(midi_num))
+            converted.push(midi_num)
         } else {
             converted.push(midi_num)
         }
@@ -630,9 +644,10 @@ function convertNumFromTopBass() {
             case 16: midi_num = 31; break;
             case 17: midi_num = 29; break;
         }
+        midi_num = topToNumHelper(midi_num)
         if (accidentals[i] != 2) {
             midi_num += accidentals[i]
-            converted.push(topToNumHelper(midi_num))
+            converted.push(midi_num)
         } else {
             converted.push(midi_num)
         } 
@@ -649,6 +664,7 @@ function check_note(note) {
         solution  = convertNumFromTopBass()
     }
 
+    // console.log(solution)
     if (solution_obj.notes.length == 0 && solution.length > 0) {
         for (var i = 0; i < solution.length - 1; i++) {
             solution_obj.notes.push(undefined)
@@ -718,7 +734,7 @@ function redo() {
 
 function reset() {
 
-    if (get_fut_notenums().length > 0) {
+    if (get_fut_notenums().length > 0 && is_complete()) {
         saveSolution()
         $('#save_modal').modal('show');
     }
@@ -786,8 +802,6 @@ function check_answer() {
     for (var i = 0; i < solNums.length; i++) {
         solutionPoints.push(solPoints[i])
         solutionNums.push(solNums[i])
-        console.log(solutionPoints)
-        console.log(solutionNums)
         if (!check_note()) {
             wrongNote = i;
             solutionPoints = []
@@ -1036,10 +1050,19 @@ function saveSolution() {
     var s = states[states.length - 1]
     var name = Exercise.get_key_center_name() + " " + Exercise.get_mode_name()
     if (Exercise.upper_cp) {
-        name += " upper"
+        name += ", upper"
     } else {
-        name += " lower"
+        name += ", lower"
     }
+
+    if (Exercise.beginning)
+        name += ", beginning"
+    else if (Exercise.climax)
+        name += ", climax"
+    else if (Exercise.end) 
+        name += ", end"
+    else if (Exercise.entire)
+        name += ", entire"
     saved.push({name, s})
 
 }
@@ -1048,6 +1071,7 @@ function openLoadModal() {
     if (saved.length == 0) 
         return
     var container = document.getElementById('state_select')
+    container.innerHTML = ""
     for (var i = 0; i < saved.length; i++) {
         container.innerHTML += "<option>" + saved[i].name + "</option>"
     }

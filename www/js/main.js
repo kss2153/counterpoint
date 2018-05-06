@@ -1,7 +1,16 @@
 var state = null
 var roomForClef = 0
+var selectedCantus = 0
 
 window.onload = window.onresize = function() {
+    $('.list-group-item').on('click', function() {
+        var $this = $(this);
+        var $alias = $this.data('alias');
+        $('.active').removeClass('active');
+        $this.toggleClass('active')
+        selectedCantus = parseInt($alias);
+    })
+    
 
     document.body.addEventListener('keydown', function (e) {
         if (e.keyCode == 8)
@@ -97,6 +106,22 @@ function exercise_setup() {
     pushState()
 }
 
+function setup_example(example) {
+    var t = document.getElementById('toggle')
+    if (t.innerHTML == "upper")
+        Exercise.setUpper()
+    else
+        Exercise.setLower()
+
+    ex = example
+
+    Exercise.inputCF(ex.cf)
+    Exercise.setMode(ex.mode)
+    Exercise.example = ex
+    states = []
+    pushState()
+}
+
 CANTUS_FIRMI = [
 
     new Example([60, 62, 65, 64, 65, 67, 69, 67, 64, 62, 60], 1, 'Schenker'), // SCHENKER 1
@@ -159,10 +184,32 @@ function setExerciseRange(num) {
         case 2: instr.innerHTML = 'complete three notes with the climax in the middle'; break;
         case 3: instr.innerHTML = 'complete the final three notes'; break;
     }
+    if (num != 0)
+        reset()
+    else {
+        if (is_complete()) {
+            saveSolution()
+            $('#save_modal').modal('show');
+        }
+    }
     Exercise.set_range(num)
-    reset()
-    exercise_setup()
+
+    //exercise_setup()
     render_exercise()
+}
+
+function setExerciseRangeHelper(num) {
+    for (var i = 0; i < 4; i++)
+        document.getElementById(i+'').style.color = 'white'
+    document.getElementById(num+'').style.color = 'black'
+
+    var instr = document.getElementById('instruction')
+    switch (num) {
+        case 0: instr.innerHTML = 'complete the entire exercise'; break;
+        case 1: instr.innerHTML = 'complete the first three notes'; break;
+        case 2: instr.innerHTML = 'complete three notes with the climax in the middle'; break;
+        case 3: instr.innerHTML = 'complete the final three notes'; break;
+    }
 }
 
 function switchAccButton(num) {
@@ -170,13 +217,21 @@ function switchAccButton(num) {
     var active = button.classList.contains('active')
     nums = [1, -1, 2]
     for (var i = 0; i < nums.length; i++) {
-        document.getElementById('acc_'+nums[i]).classList.remove('active')
-        button.style.color = "white"
+        var b = document.getElementById('acc_'+nums[i])
+        b.classList.remove('active')
+        b.style.color = "white"
     }
     if (!active) {
         button.classList.add('active')
         button.style.color = "black"
-    }
+    } 
+}
+
+function contentsButton() {
+    var e = CANTUS_FIRMI[selectedCantus]
+    reset()
+    setup_example(e)
+    render_exercise()
 }
 
 function shuffle(arra1) {

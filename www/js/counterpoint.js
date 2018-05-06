@@ -111,18 +111,20 @@ var Exercise = new function() {
     this.get_key_center_name = function() {
         var center_norm = this.key_center
         center_norm = center_norm % 12
+        var k = this.get_key_signature()
+        var sharps = k > 0
         switch (center_norm) {
             case 0: return "C"; break;
-            case 1: return "D flat/C sharp"; break;
+            case 1: if (sharps) {return "C♯"} else {return "D♭"}; break;
             case 2: return "D"; break;
-            case 3: return "E flat/D sharp"; break;
+            case 3: if (sharps) {return "D♯"} else {return "E♭"}; break;
             case 4: return "E"; break;
             case 5: return "F"; break;
-            case 6: return "G flat/F sharp"; break;
+            case 6: if (sharps) {return "F♯"} else {return "G♭"}; break;
             case 7: return "G"; break;
-            case 8: return "A flat/G sharp"; break;
+            case 8: if (sharps) {return "G♯"} else {return "A♭"}; break;
             case 9: return "A"; break;
-            case 10: return "B flat/A sharp"; break;
+            case 10: if (sharps) {return "A♯"} else {return "B♭"}; break;
             case 11: return "B"; break;
         }
     }

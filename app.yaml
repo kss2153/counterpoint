@@ -4,6 +4,10 @@ threadsafe: true
 
 handlers:
 - url: /
+  static_files: www/home.html
+  upload: www/home.html
+
+- url: /exercise
   static_files: www/index.html
   upload: www/index.html
 
